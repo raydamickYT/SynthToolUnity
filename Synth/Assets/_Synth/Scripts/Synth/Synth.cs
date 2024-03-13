@@ -4,45 +4,65 @@ using UnityEngine;
 using FMODUnity;
 using System;
 using System.Runtime.InteropServices;
+using Unity.VisualScripting;
 
 public class Synth : MonoBehaviour
 {
-
+    public static Synth instance;
     public float frequency = 440f; // A4 noot
     private float increment;
     private float phase;
-    private float sampling_frequency = 48000f;
+    private int sampling_frequency = 48000;
+    public string DspNames = "";
 
     //static vars
     // Houd bij welke golfvorm momenteel wordt gebruikt.
     public static WaveForm currentWaveForm = WaveForm.Sine;
 
-    FMOD.DSP_DESCRIPTION dspDesc = new FMOD.DSP_DESCRIPTION();
+    GCHandle handle;
+    public FMOD.DSP myDsp;
+
 
     void Start()
     {
-        CheckAudioSettings();
-        CreateCustomDSP();
-        // Verkrijg het FMOD systeem instance.
-        FMOD.System system = RuntimeManager.CoreSystem;
+
 
         // Andere setup of initialisatiecode hier...
     }
+
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            // DontDestroyOnLoad(this);
+        }
+        else
+        {
+            Destroy(this); //als er een duplicate is willen we dat het nieuwe object verwijdert wordt.
+        }
+        CheckAudioSettings();
+        CreateCustomDSP();
+        handle = GCHandle.Alloc(this, GCHandleType.Weak);
+        IntPtr ptr = (IntPtr)handle;
+        myDsp.setUserData(ptr);
+
+    }
     void CheckAudioSettings()
     {
+        // Verkrijg het FMOD systeem instance.
         FMOD.System system = RuntimeManager.CoreSystem; // Verkrijg het FMOD systeem
-        int sampleRate;
         FMOD.SPEAKERMODE speakerMode;
         int raw;
 
-        // Verkrijg de huidige softwareformat instellingen
-        system.getSoftwareFormat(out sampleRate, out speakerMode, out raw);
+        // krijg de huidige softwareformat instellingen
+        system.getSoftwareFormat(out sampling_frequency, out speakerMode, out raw);
 
         // Output de waarden naar de console voor debugging
-        Debug.Log("Sample Rate: " + sampleRate);
+        Debug.Log("Sample Rate: " + sampling_frequency);
         Debug.Log("Speaker Mode: " + speakerMode);
     }
-    void CreateCustomDSP()
+    public void CreateCustomDSP()
     {
         FMOD.DSP_DESCRIPTION dspDescription = new FMOD.DSP_DESCRIPTION();
 
@@ -56,12 +76,12 @@ public class Synth : MonoBehaviour
         nameWithNullByte[nameWithNullByte.Length - 1] = 0; // Voeg null-byte toe aan het einde
 
         dspDescription.name = nameWithNullByte; // Zorg ervoor dat de naam eindigt met een null-terminator
-        dspDescription.read = DSPReadCallback;
+        //.read is blijkbaar een delegate...
+        dspDescription.read = DSPReadCallback; //zal altijd een float terug krijgen, dit zorgt voor andere geluiden.
 
-        FMOD.RESULT result;
-        FMOD.DSP myDsp;
-        result = RuntimeManager.CoreSystem.createDSP(ref dspDescription, out myDsp);
-        if (result != FMOD.RESULT.OK)
+        FMOD.RESULT result; //in deze var wordt het resultaat zo opgeslagen (ok, error)
+        result = RuntimeManager.CoreSystem.createDSP(ref dspDescription, out myDsp); //maak de dsp met alle info die we net in het description obj hebben gestopt.
+        if (result != FMOD.RESULT.OK) //check even of de task wel completed is.
         {
             Debug.LogError("Failed to create DSP: " + result);
             return;
@@ -70,12 +90,18 @@ public class Synth : MonoBehaviour
         FMOD.ChannelGroup masterGroup;
         RuntimeManager.CoreSystem.getMasterChannelGroup(out masterGroup);
         masterGroup.addDSP(FMOD.CHANNELCONTROL_DSP_INDEX.HEAD, myDsp);
-        myDsp.setBypass(false);
-        myDsp.setActive(true);
 
-
-        // Voeg je DSP toe aan de DSP-keten als dat nodig is
-        // Bijvoorbeeld: RuntimeManager.CoreSystem.addDSP(FMOD.CHANNELCONTROL_DSP_INDEX.HEAD, myDsp);
+        // activeer je dsp
+        myDsp.setBypass(false); // false: hij wordt niet bypassed
+        /*
+        wat de bypass doet is dat deze dsp wordt overgeslagen bij het afspelen. hij blijft in de verwerkingsketen, dit is handig als je 
+        de dsp vaak aan en uit wilt zetten. Het is niet heel zuinig (omdat hij blijft doorwerken in de achtergrond). 
+        */
+        myDsp.setActive(false); //false: hij wordt niet aangezet
+        /*
+        Setactive is voor dsp's hetzelfde als met game objecten: hij is niet actief en wordt dus niet uitgevoerd. Zuinig en snel, naar mijn mening is de de beste manier voor 
+        dit project om de dsp's te toggelen.
+        */
     }
 
 
@@ -92,7 +118,9 @@ public class Synth : MonoBehaviour
             {
                 case WaveForm.Sine:
                     // Genereer een sinusgolf sample.
-                    sampleValue = GenerateSineWave(sampleIndex, length);
+                    // sampleValue = GenerateSineWave(sampleIndex, length);
+                    sampleValue = GenerateSineWave(instance.frequency, (uint)instance.sampling_frequency, ref instance.phase, sampleIndex);
+
                     break;
                 case WaveForm.Sawtooth:
                     // Genereer een zaagtandgolf sample.
@@ -121,11 +149,15 @@ public class Synth : MonoBehaviour
         return FMOD.RESULT.OK;
     }
 
-    static float GenerateSineWave(uint index, uint length)
+    public static float GenerateSineWave(float frequency, uint sampleRate, ref float phase, uint index)
     {
-        // Implementeer de daadwerkelijke sinusgolf generatie.
-        // Dit is een voorbeeld en moet worden aangepast aan je specifieke behoeften.
-        return Mathf.Sin(2 * Mathf.PI * 440 * index / 48000);
+        float sample = Mathf.Sin(phase);
+        float phaseIncrement = 2f * Mathf.PI * frequency / sampleRate;
+        phase += phaseIncrement;
+        // Zorg ervoor dat de fase niet te groot wordt
+        if (phase >= 2f * Mathf.PI) phase -= 2f * Mathf.PI;
+
+        return sample;
     }
 
     static float GenerateSawtoothWave(uint index, uint length)
