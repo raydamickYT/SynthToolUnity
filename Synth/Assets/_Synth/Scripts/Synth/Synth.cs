@@ -220,12 +220,13 @@ public class SynthState
     public float[] mDataBuffer;
 
 
-    public SynthState(float frequency, uint samplingFrequency, float carrierPhase, float[] _mDataBuffer)
+    public SynthState(float frequency, uint samplingFrequency, float[] _mdata)
     {
         Frequency = frequency;
         SamplingFrequency = samplingFrequency;
-        CarrierPhase = carrierPhase;
-        mDataBuffer = _mDataBuffer;
+        mDataBuffer = _mdata;
     }
+
+    public WaveForm CurrentWaveForm { get; internal set; }
 }
 

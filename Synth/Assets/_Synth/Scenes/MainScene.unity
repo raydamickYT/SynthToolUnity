@@ -1997,6 +1997,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fa0f6e617c66d540887fe7388d6ca5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ChangeWave: {fileID: 369912527}
+  CurrentWaveForm: 0
 --- !u!1 &2028288033
 GameObject:
   m_ObjectHideFlags: 0

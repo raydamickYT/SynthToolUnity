@@ -1,13 +1,17 @@
 using System;
 using UnityEngine;
 using System.Runtime.InteropServices;
+using UnityEngine.UI;
 
 class VoorbeeldScript : MonoBehaviour
 {
+    public Dropdown ChangeWave;
+
     private FMOD.DSP_READ_CALLBACK mReadCallback;
     private FMOD.DSP mCaptureDSP;
     private float[] mDataBuffer;
     private GCHandle mObjHandle;
+    public WaveForm CurrentWaveForm = WaveForm.Sine; // Standaard golfvorm
     private uint mBufferLength;
     private int mChannels = 0;
     private float sineFrequency = 440f; // Frequentie van de sinusgolf in Hz
@@ -24,7 +28,7 @@ class VoorbeeldScript : MonoBehaviour
         functions.getuserdata(ref dsp_state, out userData);
 
         GCHandle objHandle = GCHandle.FromIntPtr(userData);
-        SynthState obj = objHandle.Target as SynthState;
+        VoorbeeldScript obj = objHandle.Target as VoorbeeldScript;
 
         // Save the channel count out for the update function
         // obj.mChannels = inchannels;
@@ -33,23 +37,32 @@ class VoorbeeldScript : MonoBehaviour
         float[] tempBuffer = new float[length * inchannels];
         Marshal.Copy(inbuffer, tempBuffer, 0, tempBuffer.Length);
 
+        //todo: KRIJG GELUID UIT DIT KANKER DING
         // Genereren van een sinusgolf en toevoegen aan de tempBuffer
-        for (int i = 0; i < length; i++)
+        for (uint sampleIndex = 0; sampleIndex < length; sampleIndex++)
         {
-            float sineSample = Mathf.Sin(2f * Mathf.PI * obj.Frequency * obj.CarrierPhase);
-            tempBuffer[i * inchannels] += sineSample; // Voeg toe aan het linker kanaal
-
-            if (inchannels > 1)
+            float sampleValue = 0f;
+            switch (obj.CurrentWaveForm) // Gebruik de huidige golfvorm
             {
-                tempBuffer[i * inchannels + 1] += sineSample; // Voeg toe aan het rechter kanaal als stereo
-            }
+                case WaveForm.Sine:
+                    sampleValue = obj.GenerateSineWave(obj.sineFrequency, (uint)obj.sampleRate, ref obj.phase, sampleIndex);
+                    break;
+                case WaveForm.Sawtooth:
+                    sampleValue = obj.GenerateSawtoothWave(sampleIndex, length);
+                    // Bereken de zaagtandgolf sample
+                    break;
+                case WaveForm.Square:
+                    // Bereken de vierkantgolf sample
+                    sampleValue = obj.GenerateSquareWave(sampleIndex, length);
 
-            obj.CarrierPhase += obj.Frequency / obj.SamplingFrequency;
-            if (obj.CarrierPhase >= 1f)
-            {
-                obj.CarrierPhase -= 1f;
+                    break;
+                case WaveForm.Triangle:
+                    // Bereken de driehoeksgolf sample
+                    sampleValue = obj.GenerateTriangleWave(sampleIndex, length);
+                    break;
             }
         }
+
         //--------
 
         // Copy the incoming buffer to process later
@@ -77,9 +90,9 @@ class VoorbeeldScript : MonoBehaviour
         mBufferLength = bufferLength;
 
         // Get a handle to this object to pass into the callback
-        SynthState synthState = new(sineFrequency, (uint)sampleRate, phase, mDataBuffer);
+        // SynthState synthState = new(sineFrequency, (uint)sampleRate, mDataBuffer);
 
-        mObjHandle = GCHandle.Alloc(synthState);
+        mObjHandle = GCHandle.Alloc(this);
         if (mObjHandle != null)
         {
             // Define a basic DSP that receives a callback each mix to capture audio
@@ -114,6 +127,38 @@ class VoorbeeldScript : MonoBehaviour
         {
             Debug.LogWarningFormat("FMOD: Unable to create a GCHandle: mObjHandle");
         }
+    }
+
+
+    public float GenerateSineWave(float frequency, uint sampleRate, ref float phase, uint index)
+    {
+        float sample = Mathf.Sin(phase);
+        float phaseIncrement = 2f * Mathf.PI * frequency / sampleRate;
+        phase += phaseIncrement;
+        // Zorg ervoor dat de fase niet te groot wordt
+        if (phase >= 2f * Mathf.PI) phase -= 2f * Mathf.PI;
+
+        return sample;
+    }
+    
+    private void WaveChanged(Dropdown change)
+    {
+        Debug.Log("dropdown changed to value: " + change.value);
+        switch (change.value)
+        {
+            case 0: //sine wave
+                Synth.currentWaveForm = WaveForm.Sine;
+                break;
+            case 1: // sawtooth
+                Synth.currentWaveForm = WaveForm.Sawtooth;
+                break;
+            case 2: //square
+                Synth.currentWaveForm = WaveForm.Square;
+                break;
+            default:
+                break;
+        }
+
     }
 
     void OnDestroy()
@@ -154,5 +199,26 @@ class VoorbeeldScript : MonoBehaviour
                 Debug.DrawLine(new Vector3(x, (YOFFSET * i) + y, 0), new Vector3(x, (YOFFSET * i) - y, 0), Color.green);
             }
         }
+    }
+
+
+    float GenerateSawtoothWave(uint index, uint length)
+    {
+        // Implementeer zaagtandgolf generatie.
+        return 2f * (index / (float)length) - 1f;
+    }
+
+    float GenerateSquareWave(uint index, uint length)
+    {
+        // Implementeer vierkantgolf generatie.
+        return index < length / 2 ? 1f : -1f;
+    }
+
+    float GenerateTriangleWave(uint index, uint length)
+    {
+        // Implementeer driehoeksgolf generatie.
+        float position = (index / (float)length) * 4f;
+        if (position < 2f) return position - 1f;
+        else return 3f - position;
     }
 }
