@@ -16,7 +16,7 @@ public class UIManager : MonoBehaviour
     }
     private void Initialization()
     {
-        Synth.instance.myDsp.getActive(out SynthIsPlaying);
+        // Synth.instance.myDsp.getActive(out SynthIsPlaying);
         VolumeSlider.value = Synth.instance.frequency;
         VolumeSlider.onValueChanged.AddListener(ChangeFreq);
         ChangeWave.onValueChanged.AddListener(delegate

@@ -8,11 +8,15 @@ using Unity.VisualScripting;
 
 public class Synth : MonoBehaviour
 {
+    //fmod
+
+
+
     public static Synth instance;
     public float frequency = 440f; // A4 noot
     private float increment;
-    private float phase;
-    private int sampling_frequency = 48000;
+    private float phase = 0;
+    private int sampling_frequency; //dit is alleen om te kijken wat de freq is nu
     public string DspNames = "";
 
     //static vars
@@ -26,12 +30,15 @@ public class Synth : MonoBehaviour
     void Start()
     {
 
+        // FMOD.DSP_READ_CALLBACK mReadCallback;
+
 
         // Andere setup of initialisatiecode hier...
     }
 
     void Awake()
     {
+
         if (instance == null)
         {
             instance = this;
@@ -76,7 +83,7 @@ public class Synth : MonoBehaviour
         nameWithNullByte[nameWithNullByte.Length - 1] = 0; // Voeg null-byte toe aan het einde
 
         dspDescription.name = nameWithNullByte; // Zorg ervoor dat de naam eindigt met een null-terminator
-        //.read is blijkbaar een delegate...
+                                                //.read is blijkbaar een delegate...
         dspDescription.read = DSPReadCallback; //zal altijd een float terug krijgen, dit zorgt voor andere geluiden.
 
         FMOD.RESULT result; //in deze var wordt het resultaat zo opgeslagen (ok, error)
@@ -86,6 +93,12 @@ public class Synth : MonoBehaviour
             Debug.LogError("Failed to create DSP: " + result);
             return;
         }
+        //geef userdata mee
+        // SynthState synthState = new(frequency, (uint)sampling_frequency, phase);
+        // GCHandle handle = GCHandle.Alloc(synthState, GCHandleType.Pinned);
+
+        IntPtr userDataPtr = GCHandle.ToIntPtr(handle);
+        myDsp.setUserData(userDataPtr);
 
         FMOD.ChannelGroup masterGroup;
         RuntimeManager.CoreSystem.getMasterChannelGroup(out masterGroup);
@@ -106,10 +119,19 @@ public class Synth : MonoBehaviour
 
 
     // DSP Read Callback
+    [AOT.MonoPInvokeCallback(typeof(FMOD.DSP_READ_CALLBACK))]
     public static FMOD.RESULT DSPReadCallback(ref FMOD.DSP_STATE dsp_state, IntPtr inbuffer, IntPtr outbuffer, uint length, int inchannels, ref int outchannels)
     {
         // Een buffer voor de samples.
         float[] buffer = new float[length * outchannels];
+        FMOD.DSP_STATE_FUNCTIONS functions = (FMOD.DSP_STATE_FUNCTIONS)Marshal.PtrToStructure(dsp_state.functions, typeof(FMOD.DSP_STATE_FUNCTIONS));
+
+        IntPtr userData;
+        functions.getuserdata(ref dsp_state, out userData);
+
+        GCHandle objHandle = GCHandle.FromIntPtr(userData);
+        SynthState obj = objHandle.Target as SynthState;
+        Debug.Log("obj");
 
         for (uint sampleIndex = 0; sampleIndex < length; sampleIndex++)
         {
@@ -188,5 +210,22 @@ public enum WaveForm
     Sawtooth,
     Square,
     Triangle
+}
+
+public class SynthState
+{
+    public float Frequency;
+    public uint SamplingFrequency;
+    public float CarrierPhase;
+    public float[] mDataBuffer;
+
+
+    public SynthState(float frequency, uint samplingFrequency, float carrierPhase, float[] _mDataBuffer)
+    {
+        Frequency = frequency;
+        SamplingFrequency = samplingFrequency;
+        CarrierPhase = carrierPhase;
+        mDataBuffer = _mDataBuffer;
+    }
 }
 
