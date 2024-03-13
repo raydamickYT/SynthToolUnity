@@ -46,6 +46,23 @@ class VoorbeeldScript : MonoBehaviour
             {
                 case WaveForm.Sine:
                     sampleValue = obj.GenerateSineWave(obj.sineFrequency, (uint)obj.sampleRate, ref obj.phase, sampleIndex);
+                    Debug.Log(sampleValue);
+                    // for (int i = 0; i < length; i++)
+                    // {
+                    //     float sineSample = Mathf.Sin(2f * Mathf.PI * obj.sineFrequency * obj.phase);
+                    //     tempBuffer[i * inchannels] += sineSample; // Voeg toe aan het linker kanaal
+
+                    //     if (inchannels > 1)
+                    //     {
+                    //         tempBuffer[i * inchannels + 1] += sineSample; // Voeg toe aan het rechter kanaal als stereo
+                    //     }
+
+                    //     obj.phase += obj.sineFrequency / obj.sampleRate;
+                    //     if (obj.phase >= 1f)
+                    //     {
+                    //         obj.phase -= 1f;
+                    //     }
+                    // }
                     break;
                 case WaveForm.Sawtooth:
                     sampleValue = obj.GenerateSawtoothWave(sampleIndex, length);
@@ -140,7 +157,7 @@ class VoorbeeldScript : MonoBehaviour
 
         return sample;
     }
-    
+
     private void WaveChanged(Dropdown change)
     {
         Debug.Log("dropdown changed to value: " + change.value);
