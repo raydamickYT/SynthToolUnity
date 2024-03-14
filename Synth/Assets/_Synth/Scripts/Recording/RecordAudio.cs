@@ -8,11 +8,12 @@ using System.Runtime.InteropServices; // standalone file browser
 
 public class AudioRecorder : MonoBehaviour
 {
-    [SerializeField] private VoorbeeldScript voorbeeldScript;
+    [SerializeField] VoorbeeldScript voorbeeldScript;
+    [SerializeField] private int sampleRate = 44100; // Standaard sample rate
     private FMOD.System system; // FMOD low-level system instance
     private FMOD.Sound sound; // Sound object to hold the recording
-    private uint soundLength; // Length of the recording
     private bool isRecording = false; // Flag to check if currently recording
+    private int numChannels = 2; // Aantal kanalen (stereo)
 
     void Start()
     {
@@ -25,7 +26,22 @@ public class AudioRecorder : MonoBehaviour
     {
         if (isRecording) return; // Check if already recording
 
-        system.createSound("record.wav", MODE.CREATESTREAM | MODE.LOOP_NORMAL | MODE.OPENUSER, out sound);
+        FMOD.CREATESOUNDEXINFO soundExInfo = new FMOD.CREATESOUNDEXINFO
+        {
+            cbsize = Marshal.SizeOf(typeof(FMOD.CREATESOUNDEXINFO)),
+            numchannels = numChannels, // Stereo
+            defaultfrequency = sampleRate, // 44100 Hz
+            format = FMOD.SOUND_FORMAT.PCM16, // 16-bit PCM audio
+            length = (uint)(10 * sampleRate * numChannels * sizeof(short)) // Voor 10 seconden opname
+        };
+
+        FMOD.RESULT result = system.createSound((String)null, FMOD.MODE.CREATESAMPLE | FMOD.MODE.LOOP_OFF | FMOD.MODE.OPENUSER, ref soundExInfo, out sound);
+        if (result != FMOD.RESULT.OK)
+        {
+            UnityEngine.Debug.LogError("Failed to create sound for recording: " + result.ToString());
+            return;
+        }
+
         system.recordStart(0, sound, true);
         isRecording = true;
         UnityEngine.Debug.Log("Recording started...");
@@ -40,29 +56,30 @@ public class AudioRecorder : MonoBehaviour
         UnityEngine.Debug.Log("Recording stopped.");
 
         // Laat de gebruiker kiezen waar de opname op te slaan
-        string paths = StandaloneFileBrowser.SaveFilePanel("Save Recording", "", "MyRecording", "wav");
-        if (paths.Length > 0 && !string.IsNullOrEmpty(paths))
+        string path = StandaloneFileBrowser.SaveFilePanel("Save Recording", "", "MyRecording", "wav");
+        if (!string.IsNullOrEmpty(path))
         {
-            SaveRecording(paths);
+            SaveRecording(path);
         }
     }
 
-    // Slaat de opname op op de gespecificeerde locatie
-    // Aangenomen dat deze methode de opnamepad krijgt waar het bestand moet worden opgeslagen
     private void SaveRecording(string path)
     {
         FMOD.RESULT result;
         IntPtr ptr1 = IntPtr.Zero, ptr2 = IntPtr.Zero;
         uint len1 = 0, len2 = 0;
+        uint length = 0;
 
-        // Aangenomen dat 'sound' en 'soundLength' eerder correct zijn ingesteld.
-        // Verkrijg de lengte van het geluid om te bepalen hoeveel data we moeten vergrendelen en lezen.
-        sound.getLength(out uint soundLength, FMOD.TIMEUNIT.PCM);
+        // Eerst ophalen van de geluidslengte
+        result = sound.getLength(out length, FMOD.TIMEUNIT.PCMBYTES);
+        if (result != FMOD.RESULT.OK)
+        {
+            UnityEngine.Debug.LogError("Failed to get sound length: " + result.ToString());
+            return;
+        }
 
-        // Probeer het gehele geluid te vergrendelen voor toegang.
-        // de @ is noodzakelijk om de compiler te vertellen dat j e de lock methode van het fmod.sound object
-        // bedoelt. en niet het lock keyword van c#
-    result = sound.@lock(0, soundLength, out ptr1, out ptr2, out len1, out len2);
+        // Nu het geluid vergrendelen met de verkregen lengte
+        result = sound.@lock(0, length, out ptr1, out ptr2, out len1, out len2);
         if (result != FMOD.RESULT.OK)
         {
             UnityEngine.Debug.LogError("Failed to lock sound: " + result.ToString());
@@ -73,17 +90,15 @@ public class AudioRecorder : MonoBehaviour
         byte[] audioData = new byte[len1];
         Marshal.Copy(ptr1, audioData, 0, (int)len1);
 
-        // Hier zou je de logica implementeren om 'audioData' naar een bestand te schrijven, zoals eerder besproken.
-
-        // Vergeet niet het geluid te ontgrendelen nadat je klaar bent.
+        // Nu het geluid ontgrendelen
         result = sound.unlock(ptr1, ptr2, len1, len2);
         if (result != FMOD.RESULT.OK)
         {
             UnityEngine.Debug.LogError("Failed to unlock sound: " + result.ToString());
         }
+
+        // De rest van je SaveRecording logica hier...
     }
-
-
 
     // Methode om een eenvoudige WAV-header te schrijven. Dit is vereenvoudigd en gaat ervan uit dat de audio 16-bit PCM is.
     private void WriteWavHeader(FileStream stream, int dataLength)
