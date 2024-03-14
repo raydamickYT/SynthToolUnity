@@ -24,7 +24,7 @@ class VoorbeeldScript : MonoBehaviour
     private int mChannels = 0;
     public float sineFrequency = 440f; // Frequentie van de sinusgolf in Hz
     private float phase = 0f; // Fase van de sinusgolf
-    private int sampleRate = 48000; // Stel dit in op de daadwerkelijke sample rate van je systeem
+    public int sampleRate = 48000; // Stel dit in op de daadwerkelijke sample rate van je systeem
 
 
     [AOT.MonoPInvokeCallback(typeof(FMOD.DSP_READ_CALLBACK))]

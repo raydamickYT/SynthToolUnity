@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
@@ -6,6 +7,8 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     [SerializeField] private VoorbeeldScript voorbeeldScript;
+    [SerializeField] private SettingsSaver settingsSaver;
+    [SerializeField] private SettingsLoader settingsLoader;
     public Button OnOffBtn;
     public Dropdown ChangeWave;
     public Slider VolumeSlider;
@@ -87,5 +90,25 @@ public class UIManager : MonoBehaviour
         Debug.Log(vol);
         // Synth.instance.myDsp.setParameterFloat(FMODUnity.FMOD.DSP_INDEX.HEAD, vol); // hier is 0 aangegeven omdat (meestal) de default voor de volume parameter 0 is. 
         voorbeeldScript.sineFrequency = vol;
+    }
+    public void SaveSettings()
+    {
+        SynthState synthState = new SynthState(voorbeeldScript.sineFrequency, (uint)voorbeeldScript.sampleRate, voorbeeldScript.CurrentWaveForm);
+        settingsSaver.SaveSettingsWithFileDialog(synthState);
+    }
+
+    public void LoadSettings()
+    {
+        SynthState synthState = new SynthState();
+
+        // Vraag de gebruiker om een bestandspad te kiezen
+        string filePath = EditorUtility.OpenFilePanel("Load Settings", "", "txt");
+
+        // Controleer of de gebruiker een pad heeft gekozen
+        if (!string.IsNullOrEmpty(filePath))
+        {
+            // Laad de instellingen vanuit het gekozen bestandspad
+            settingsLoader.LoadSettings(filePath, synthState);
+        }
     }
 }

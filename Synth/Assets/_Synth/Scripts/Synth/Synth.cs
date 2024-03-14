@@ -218,15 +218,20 @@ public class SynthState
     public uint SamplingFrequency;
     public float CarrierPhase;
     public float[] mDataBuffer;
+    public WaveForm CurrentWaveForm { get; internal set; }
 
-
-    public SynthState(float frequency, uint samplingFrequency, float[] _mdata)
+    public SynthState()
+    {
+        Frequency = 0;
+        SamplingFrequency = 0;
+        CurrentWaveForm = WaveForm.Sine; //sine is gwn de default
+    }
+    public SynthState(float frequency, uint samplingFrequency, WaveForm _current)
     {
         Frequency = frequency;
         SamplingFrequency = samplingFrequency;
-        mDataBuffer = _mdata;
+        CurrentWaveForm = _current;
     }
 
-    public WaveForm CurrentWaveForm { get; internal set; }
 }
 
