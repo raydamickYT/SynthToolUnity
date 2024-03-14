@@ -707,6 +707,7 @@ RectTransform:
   - {fileID: 1767148216}
   - {fileID: 369912526}
   - {fileID: 1366844109}
+  - {fileID: 1113577841}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -792,6 +793,78 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 802959410}
+  m_CullTransparentMesh: 1
+--- !u!1 &1113577840
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1113577841}
+  - component: {fileID: 1113577843}
+  - component: {fileID: 1113577842}
+  m_Layer: 5
+  m_Name: WaveVisual
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1113577841
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1113577840}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 790772926}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -293.92, y: 0}
+  m_SizeDelta: {x: 255.4, y: 304.8}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1113577842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1113577840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 0}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!222 &1113577843
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1113577840}
   m_CullTransparentMesh: 1
 --- !u!1 &1194554400
 GameObject:
@@ -1302,12 +1375,12 @@ GameObject:
   - component: {fileID: 1420671199}
   - component: {fileID: 1420671200}
   m_Layer: 0
-  m_Name: Synth (1)
+  m_Name: visualizer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1420671199
 Transform:
   m_ObjectHideFlags: 0
@@ -1332,11 +1405,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1420671198}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93f676f4c6e00184ab4dd275e65b978c, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d05acf9de0dced4d8e663e55dca6191, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 440
-  DspNames: 
+  rawImage: {fileID: 1113577842}
+  textureWidth: 512
+  textureHeight: 128
 --- !u!1 &1530871633
 GameObject:
   m_ObjectHideFlags: 0

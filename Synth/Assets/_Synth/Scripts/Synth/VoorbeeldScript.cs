@@ -1,22 +1,30 @@
-using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using FMODUnity;
+using System;
 using System.Runtime.InteropServices;
+using Unity.VisualScripting;
+
 using UnityEngine.UI;
 
 class VoorbeeldScript : MonoBehaviour
 {
+    private float savedSampleValue;
     public Dropdown ChangeWave;
     public bool DSPIsActive = false;
     private FMOD.DSP_READ_CALLBACK mReadCallback;
     public FMOD.DSP mCaptureDSP;
-    private float[] mDataBuffer;
+    private float[] mDataBuffer, sharedBuffer;
+    private readonly object bufferLock = new object();
+
     private GCHandle mObjHandle;
-    public WaveForm CurrentWaveForm = WaveForm.Sine; // Standaard golfvorm
+    public WaveForm CurrentWaveForm = WaveForm.Sawtooth; // Standaard golfvorm
     private uint mBufferLength;
     private int mChannels = 0;
     public float sineFrequency = 440f; // Frequentie van de sinusgolf in Hz
     private float phase = 0f; // Fase van de sinusgolf
-    private float sampleRate = 48000f; // Stel dit in op de daadwerkelijke sample rate van je systeem
+    private int sampleRate = 48000; // Stel dit in op de daadwerkelijke sample rate van je systeem
 
 
     [AOT.MonoPInvokeCallback(typeof(FMOD.DSP_READ_CALLBACK))]
@@ -36,7 +44,7 @@ class VoorbeeldScript : MonoBehaviour
 
         //-------------------------
         //geluid
-        float[] tempBuffer = new float[length * obj.mChannels];
+        obj.sharedBuffer = new float[length * obj.mChannels];
         for (uint sampleIndex = 0; sampleIndex < length; sampleIndex++)
         {
             float sampleValue = 0f;
@@ -46,23 +54,24 @@ class VoorbeeldScript : MonoBehaviour
                     sampleValue = obj.GenerateSineWave(obj.sineFrequency, (uint)obj.sampleRate, ref obj.phase, sampleIndex);
                     break;
                 case WaveForm.Sawtooth:
-                    sampleValue = obj.GenerateSawtoothWave(sampleIndex, length);
+                    sampleValue = obj.GenerateSawtoothWave(obj.sineFrequency, (uint)obj.sampleRate, ref obj.phase, sampleIndex);
                     // Bereken de zaagtandgolf sample
                     break;
                 case WaveForm.Square:
                     // Bereken de vierkantgolf sample
-                    sampleValue = obj.GenerateSquareWave(sampleIndex, length);
+                    sampleValue = obj.GenerateSquareWave(sampleIndex, (uint)obj.sampleRate, obj.sineFrequency);
 
                     break;
                 case WaveForm.Triangle:
                     // Bereken de driehoeksgolf sample
-                    sampleValue = obj.GenerateTriangleWave(sampleIndex, length);
+                    sampleValue = obj.GenerateTriangleWave(sampleIndex, (uint)obj.sampleRate, obj.sineFrequency);
                     break;
             }
             for (int channel = 0; channel < outchannels; channel++)
             {
                 // Copy the incoming buffer to process later
-                tempBuffer[sampleIndex * outchannels + channel] = sampleValue; //bereken de juiste index in tempbuffer, waar de sample value wordt opgeslagen
+                obj.sharedBuffer[sampleIndex * outchannels + channel] = sampleValue; //bereken de juiste index in tempbuffer, waar de sample value wordt opgeslagen
+                obj.savedSampleValue = sampleValue;
                 //voor stereo channels vermenigvuldigt het met *2 (twee output kanalen), en voegt channel toe aan deze waarde (oftewel links, channel 0, recht, channel 1).
             }
         }
@@ -70,15 +79,45 @@ class VoorbeeldScript : MonoBehaviour
         //--------
         // Copy the inbuffer to the outbuffer so we can still hear it
         // Vul het geheugen met de gegenereerde sample voor alle kanalen.
-        Marshal.Copy(tempBuffer, 0, outbuffer, tempBuffer.Length);// kopieer de buffer naar de geheugen
+        Marshal.Copy(obj.sharedBuffer, 0, outbuffer, obj.sharedBuffer.Length);// kopieer de buffer naar de geheugen
 
         return FMOD.RESULT.OK;
     }
 
     private void Awake()
     {
+        CheckAudioSettings();
         CreateDSP();
     }
+    void CheckAudioSettings()
+    {
+        // Verkrijg het FMOD systeem instance.
+        FMOD.System system = RuntimeManager.CoreSystem; // Verkrijg het FMOD systeem
+        FMOD.SPEAKERMODE speakerMode;
+        int raw;
+
+        // krijg de huidige softwareformat instellingen
+        system.getSoftwareFormat(out sampleRate, out speakerMode, out raw);
+
+        // Output de waarden naar de console voor debugging
+        Debug.Log("Sample Rate: " + sampleRate);
+        Debug.Log("Speaker Mode: " + speakerMode);
+    }
+
+    Texture2D GenerateWaveformTexture(float[] audioSamples, int width, int height)
+    {
+        Texture2D texture = new Texture2D(width, height);
+        for (int x = 0; x < width; x++)
+        {
+            float sample = audioSamples[(int)(((float)x / width) * audioSamples.Length)];
+            int y = (int)((sample + 1f) / 2f * (height - 1));  // Normalize sample to 0..height
+            texture.SetPixel(x, y, Color.black);
+        }
+        texture.Apply();
+        return texture;
+    }
+
+
     void CreateDSP()
     {
         // Assign the callback to a member variable to avoid garbage collection
@@ -140,6 +179,15 @@ class VoorbeeldScript : MonoBehaviour
 
     void Update()
     {
+        Debug.Log(sharedBuffer);
+        float[] bufferCopy;
+        lock (bufferLock)
+        {
+            bufferCopy = new float[sharedBuffer.Length];
+            Array.Copy(sharedBuffer, bufferCopy, sharedBuffer.Length);
+        }
+        WaveformVisualizer.instance.UpdateWaveform(bufferCopy);
+
         // Do what you want with the captured data
         for (int j = 0; j < mBufferLength; j++)
         {
@@ -154,6 +202,28 @@ class VoorbeeldScript : MonoBehaviour
         }
     }
 
+
+    // //wordt gebruikt door ui
+    // private void WaveChanged(Dropdown change)
+    // {
+    //     Debug.Log("dropdown changed to value: " + change.value);
+    //     switch (change.value)
+    //     {
+    //         case 0: //sine wave
+    //             Synth.currentWaveForm = WaveForm.Sine;
+    //             break;
+    //         case 1: // sawtooth
+    //             Synth.currentWaveForm = WaveForm.Sawtooth;
+    //             break;
+    //         case 2: //square
+    //             Synth.currentWaveForm = WaveForm.Square;
+    //             break;
+    //         default:
+    //             break;
+    //     }
+
+    // }
+
     public float GenerateSineWave(float frequency, uint sampleRate, ref float phase, uint index)
     {
         float sample = Mathf.Sin(phase);
@@ -164,46 +234,56 @@ class VoorbeeldScript : MonoBehaviour
         return sample;
     }
 
-    private void WaveChanged(Dropdown change)
+    public float GenerateSawtoothWave(float frequency, uint sampleRate, ref float phase, uint index)
     {
-        Debug.Log("dropdown changed to value: " + change.value);
-        switch (change.value)
-        {
-            case 0: //sine wave
-                Synth.currentWaveForm = WaveForm.Sine;
-                break;
-            case 1: // sawtooth
-                Synth.currentWaveForm = WaveForm.Sawtooth;
-                break;
-            case 2: //square
-                Synth.currentWaveForm = WaveForm.Square;
-                break;
-            default:
-                break;
-        }
+        // Bereken de fase-increment per sample
+        float phaseIncrement = 2f * Mathf.PI * frequency / sampleRate;
 
+        // Verhoog de fase met de increment
+        phase += phaseIncrement * index;
+
+        // Normaliseer de fase zodat deze altijd tussen 0 en 2π blijft
+        while (phase >= 2f * Mathf.PI)
+            phase -= 2f * Mathf.PI;
+
+        // Bereken de zaagtandwaarde, gemapt van fase naar een waarde tussen -1 en 1
+        // De fase loopt lineair op, dus we mappen deze direct naar onze output
+        float sawtooth = 2f * (phase / (2f * Mathf.PI)) - 1f;
+
+        return sawtooth;
     }
 
 
-    float GenerateSawtoothWave(uint index, uint length)
+
+    float GenerateSquareWave(uint index, uint sampleRate, float frequency)
     {
-        // Implementeer zaagtandgolf generatie.
-        return 2f * (index / (float)length) - 1f;
+        // Bereken de periode van de golf
+        float period = sampleRate / frequency;
+
+        // Bereken de positie in de huidige periode
+        float position = index % period;
+
+        // De golf wisselt tussen 1 en -1 halverwege elke periode
+        return position < period / 2 ? 1f : -1f;
     }
 
-    float GenerateSquareWave(uint index, uint length)
+    float GenerateTriangleWave(uint index, uint sampleRate, float frequency)
     {
-        // Implementeer vierkantgolf generatie.
-        return index < length / 2 ? 1f : -1f;
+        // Bereken de periode van de golf
+        float period = sampleRate / frequency;
+
+        // Bereken de positie in de huidige periode
+        float position = (index % period) / period;
+
+        // Bereken de waarde van de driehoeksgolf gebaseerd op de positie binnen de periode
+        if (position < 0.25f)
+            return 4f * position; // Oplopend van 0 naar 1
+        else if (position < 0.75f)
+            return 2f - 4f * position; // Aflopend van 1 naar -1
+        else
+            return -4f + 4f * position; // Oplopend van -1 naar 0
     }
 
-    float GenerateTriangleWave(uint index, uint length)
-    {
-        // Implementeer driehoeksgolf generatie.
-        float position = (index / (float)length) * 4f;
-        if (position < 2f) return position - 1f;
-        else return 3f - position;
-    }
 
 
     void OnDestroy()
