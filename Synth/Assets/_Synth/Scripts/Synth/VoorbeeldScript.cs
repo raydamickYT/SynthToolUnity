@@ -6,15 +6,16 @@ using UnityEngine.UI;
 class VoorbeeldScript : MonoBehaviour
 {
     public Dropdown ChangeWave;
-
+    public bool DSPIsActive = false;
     private FMOD.DSP_READ_CALLBACK mReadCallback;
-    private FMOD.DSP mCaptureDSP;
+    protected FMOD.DSP mCaptureDSP;
+    public FMOD.DSP GetDSP(){ return mCaptureDSP; }
     private float[] mDataBuffer;
     private GCHandle mObjHandle;
     public WaveForm CurrentWaveForm = WaveForm.Sine; // Standaard golfvorm
     private uint mBufferLength;
     private int mChannels = 0;
-    private float sineFrequency = 440f; // Frequentie van de sinusgolf in Hz
+    public float sineFrequency = 440f; // Frequentie van de sinusgolf in Hz
     private float phase = 0f; // Fase van de sinusgolf
     private float sampleRate = 48000f; // Stel dit in op de daadwerkelijke sample rate van je systeem
 
@@ -33,32 +34,10 @@ class VoorbeeldScript : MonoBehaviour
 
         // Save the channel count out for the update function
         obj.mChannels = inchannels;
+
+        //-------------------------
         //geluid
-        // float[] tempBuffer = new float[length * inchannels];
         float[] tempBuffer = new float[length * obj.mChannels];
-
-        // // Genereren van een sinusgolf en toevoegen aan de tempBuffer
-        // for (int i = 0; i < length; i++)
-        // {
-        //     // Bereken de fase increment
-        //     float phaseIncrement = (2f * Mathf.PI * obj.sineFrequency) / obj.sampleRate;
-
-        //     // Genereer de sinustoon voor dit sample
-        //     float sineSample = Mathf.Sin(obj.phase);
-
-        //     // Update de fase
-        //     obj.phase += phaseIncrement;
-        //     if (obj.phase > 2f * Mathf.PI)
-        //     {
-        //         obj.phase -= 2f * Mathf.PI;
-        //     }
-
-        //     // Toevoegen aan zowel linker als rechter kanaal indien stereo, of alleen linker indien mono
-        //     for (int channel = 0; channel < obj.mChannels; channel++)
-        //     {
-        //         tempBuffer[i * obj.mChannels + channel] = sineSample;
-        //     }
-        // }
         for (uint sampleIndex = 0; sampleIndex < length; sampleIndex++)
         {
             float sampleValue = 0f;
@@ -99,6 +78,10 @@ class VoorbeeldScript : MonoBehaviour
 
     void Start()
     {
+        CreateDSP();
+    }
+    void CreateDSP()
+    {
         // Assign the callback to a member variable to avoid garbage collection
         mReadCallback = CaptureDSPReadCallback;
 
@@ -126,9 +109,11 @@ class VoorbeeldScript : MonoBehaviour
             FMOD.ChannelGroup masterCG;
             if (FMODUnity.RuntimeManager.CoreSystem.getMasterChannelGroup(out masterCG) == FMOD.RESULT.OK)
             {
-                if (FMODUnity.RuntimeManager.CoreSystem.createDSP(ref desc, out mCaptureDSP) == FMOD.RESULT.OK)
+                if (FMODUnity.RuntimeManager.CoreSystem.createDSP(ref desc, out mCaptureDSP) == FMOD.RESULT.OK) //hier wordt de dsp aangemaakt
                 {
-                    if (masterCG.addDSP(0, mCaptureDSP) != FMOD.RESULT.OK)
+                    mCaptureDSP.setActive(false); //zet hem tijdelijk op inactief, dan kunnen we dat later aanpassen.
+                    mCaptureDSP.getActive(out DSPIsActive); //sla het gelijk op zodat we het in andere scripts kunnen gebruiken.
+                    if (masterCG.addDSP(0, mCaptureDSP) != FMOD.RESULT.OK) //hier voegen we hem toe aan de mastergroup (hierdoor kunnen we hem horen.)
                     {
                         Debug.LogWarningFormat("FMOD: Unable to add mCaptureDSP to the master channel group");
                     }
@@ -149,6 +134,26 @@ class VoorbeeldScript : MonoBehaviour
         }
     }
 
+
+    const float WIDTH = 0.01f;
+    const float HEIGHT = 10.0f;
+    const float YOFFSET = 5.0f;
+
+    void Update()
+    {
+        // Do what you want with the captured data
+        for (int j = 0; j < mBufferLength; j++)
+        {
+            for (int i = 0; i < mChannels; i++)
+            {
+                float x = j * WIDTH;
+                float y = mDataBuffer[(j * mChannels) + i] * HEIGHT;
+
+                // Make sure Gizmos is enabled in the Unity Editor to show debug line draw for the captured channel data
+                Debug.DrawLine(new Vector3(x, (YOFFSET * i) + y, 0), new Vector3(x, (YOFFSET * i) - y, 0), Color.green);
+            }
+        }
+    }
 
     public float GenerateSineWave(float frequency, uint sampleRate, ref float phase, uint index)
     {
@@ -180,46 +185,6 @@ class VoorbeeldScript : MonoBehaviour
 
     }
 
-    void OnDestroy()
-    {
-        if (mObjHandle != null)
-        {
-            // Remove the capture DSP from the master channel group
-            FMOD.ChannelGroup masterCG;
-            if (FMODUnity.RuntimeManager.CoreSystem.getMasterChannelGroup(out masterCG) == FMOD.RESULT.OK)
-            {
-                if (mCaptureDSP.hasHandle())
-                {
-                    masterCG.removeDSP(mCaptureDSP);
-
-                    // Release the DSP and free the object handle
-                    mCaptureDSP.release();
-                }
-            }
-            mObjHandle.Free();
-        }
-    }
-
-    const float WIDTH = 0.01f;
-    const float HEIGHT = 10.0f;
-    const float YOFFSET = 5.0f;
-
-    void Update()
-    {
-        // Do what you want with the captured data
-        for (int j = 0; j < mBufferLength; j++)
-        {
-            for (int i = 0; i < mChannels; i++)
-            {
-                float x = j * WIDTH;
-                float y = mDataBuffer[(j * mChannels) + i] * HEIGHT;
-
-                // Make sure Gizmos is enabled in the Unity Editor to show debug line draw for the captured channel data
-                Debug.DrawLine(new Vector3(x, (YOFFSET * i) + y, 0), new Vector3(x, (YOFFSET * i) - y, 0), Color.green);
-            }
-        }
-    }
-
 
     float GenerateSawtoothWave(uint index, uint length)
     {
@@ -239,5 +204,26 @@ class VoorbeeldScript : MonoBehaviour
         float position = (index / (float)length) * 4f;
         if (position < 2f) return position - 1f;
         else return 3f - position;
+    }
+
+
+    void OnDestroy()
+    {
+        if (mObjHandle != null)
+        {
+            // Remove the capture DSP from the master channel group
+            FMOD.ChannelGroup masterCG;
+            if (FMODUnity.RuntimeManager.CoreSystem.getMasterChannelGroup(out masterCG) == FMOD.RESULT.OK)
+            {
+                if (mCaptureDSP.hasHandle())
+                {
+                    masterCG.removeDSP(mCaptureDSP);
+
+                    // Release the DSP and free the object handle
+                    mCaptureDSP.release();
+                }
+            }
+            mObjHandle.Free();
+        }
     }
 }

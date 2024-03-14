@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    [SerializeField] private VoorbeeldScript voorbeeldScript;
     public Button OnOffBtn;
     public Dropdown ChangeWave;
     public Slider VolumeSlider;
@@ -16,13 +17,16 @@ public class UIManager : MonoBehaviour
     }
     private void Initialization()
     {
-        // Synth.instance.myDsp.getActive(out SynthIsPlaying);
-        VolumeSlider.value = Synth.instance.frequency;
+        SynthIsPlaying = voorbeeldScript.DSPIsActive;
+
+        VolumeSlider.value = voorbeeldScript.sineFrequency;
         VolumeSlider.onValueChanged.AddListener(ChangeFreq);
+
         ChangeWave.onValueChanged.AddListener(delegate
         {
             WaveChanged(ChangeWave);
         });
+
         OnOffBtn.onClick.AddListener(ToggleSynth);
     }
     public void ToggleSynth()
@@ -47,13 +51,13 @@ public class UIManager : MonoBehaviour
         switch (change.value)
         {
             case 0: //sine wave
-                Synth.currentWaveForm = WaveForm.Sine;
+                voorbeeldScript.CurrentWaveForm = WaveForm.Sine;
                 break;
             case 1: // sawtooth
-                Synth.currentWaveForm = WaveForm.Sawtooth;
+                voorbeeldScript.CurrentWaveForm = WaveForm.Sawtooth;
                 break;
             case 2: //square
-                Synth.currentWaveForm = WaveForm.Square;
+                voorbeeldScript.CurrentWaveForm = WaveForm.Square;
                 break;
             default:
                 break;
@@ -79,6 +83,6 @@ public class UIManager : MonoBehaviour
     {
         Debug.Log(vol);
         // Synth.instance.myDsp.setParameterFloat(FMODUnity.FMOD.DSP_INDEX.HEAD, vol); // hier is 0 aangegeven omdat (meestal) de default voor de volume parameter 0 is. 
-        Synth.instance.frequency = vol;
+        voorbeeldScript.sineFrequency = vol;
     }
 }

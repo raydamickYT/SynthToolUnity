@@ -1501,7 +1501,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1579977273
 Transform:
   m_ObjectHideFlags: 0
@@ -1529,6 +1529,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ba29e73f33e2e64681ced16b1bf08dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  voorbeeldScript: {fileID: 1902281661}
   OnOffBtn: {fileID: 1767148217}
   ChangeWave: {fileID: 369912527}
   VolumeSlider: {fileID: 1366844110}
@@ -2045,7 +2046,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ChangeWave: {fileID: 369912527}
+  DSPIsActive: 0
   CurrentWaveForm: 0
+  sineFrequency: 440
 --- !u!1 &2028288033
 GameObject:
   m_ObjectHideFlags: 0
