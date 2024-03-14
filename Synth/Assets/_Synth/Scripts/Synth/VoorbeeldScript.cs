@@ -59,7 +59,7 @@ class VoorbeeldScript : MonoBehaviour
                     break;
                 case WaveForm.Square:
                     // Bereken de vierkantgolf sample
-                    sampleValue = obj.GenerateSquareWave(sampleIndex, (uint)obj.sampleRate, obj.sineFrequency);
+                    sampleValue = obj.GenerateSquareWave(sampleIndex, (uint)obj.sampleRate, obj.sineFrequency, ref obj.phase);
 
                     break;
                 case WaveForm.Triangle:
@@ -240,28 +240,37 @@ class VoorbeeldScript : MonoBehaviour
         float phaseIncrement = 2f * Mathf.PI * frequency / sampleRate;
 
         // Verhoog de fase met de increment
-        phase += phaseIncrement * index;
+        phase += phaseIncrement;
 
         // Normaliseer de fase zodat deze altijd tussen 0 en 2π blijft
-        while (phase >= 2f * Mathf.PI)
+        if (phase >= 2f * Mathf.PI)
             phase -= 2f * Mathf.PI;
 
         // Bereken de zaagtandwaarde, gemapt van fase naar een waarde tussen -1 en 1
         // De fase loopt lineair op, dus we mappen deze direct naar onze output
-        float sawtooth = 2f * (phase / (2f * Mathf.PI)) - 1f;
+        float sawtooth = (phase / (2f * Mathf.PI)) * 2f - 1f;
 
         return sawtooth;
     }
 
 
 
-    float GenerateSquareWave(uint index, uint sampleRate, float frequency)
+    float GenerateSquareWave(uint index, uint sampleRate, float frequency, ref float phase)
     {
+        // Bereken de fase-increment per sample
+        float phaseIncrement = 2f * Mathf.PI * frequency / sampleRate;
+
+        // Verhoog de fase met de increment
+        phase += phaseIncrement;
+
+        // Normaliseer de fase zodat deze altijd tussen 0 en 2π blijft
+        if (phase >= 2f * Mathf.PI) phase -= 2f * Mathf.PI;
+
+
         // Bereken de periode van de golf
         float period = sampleRate / frequency;
-
         // Bereken de positie in de huidige periode
-        float position = index % period;
+        float position = (index + phase / phaseIncrement) % period;
 
         // De golf wisselt tussen 1 en -1 halverwege elke periode
         return position < period / 2 ? 1f : -1f;
