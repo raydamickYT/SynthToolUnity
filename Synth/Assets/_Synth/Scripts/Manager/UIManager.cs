@@ -9,6 +9,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private VoorbeeldScript voorbeeldScript;
     [SerializeField] private SettingsSaver settingsSaver;
     [SerializeField] private SettingsLoader settingsLoader;
+    [SerializeField] private AudioRecorder audioRecorder;
+
     public Button OnOffBtn;
     public Dropdown ChangeWave;
     public Slider VolumeSlider;
@@ -110,5 +112,15 @@ public class UIManager : MonoBehaviour
             // Laad de instellingen vanuit het gekozen bestandspad
             settingsLoader.LoadSettings(filePath, synthState);
         }
+    }
+
+    public void StartRecording()
+    {
+        audioRecorder.StartRecording();
+    }
+
+    public void StopRecording()
+    {
+        audioRecorder.StopRecording();
     }
 }
