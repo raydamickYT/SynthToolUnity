@@ -8,8 +8,7 @@ class VoorbeeldScript : MonoBehaviour
     public Dropdown ChangeWave;
     public bool DSPIsActive = false;
     private FMOD.DSP_READ_CALLBACK mReadCallback;
-    protected FMOD.DSP mCaptureDSP;
-    public FMOD.DSP GetDSP(){ return mCaptureDSP; }
+    public FMOD.DSP mCaptureDSP;
     private float[] mDataBuffer;
     private GCHandle mObjHandle;
     public WaveForm CurrentWaveForm = WaveForm.Sine; // Standaard golfvorm
@@ -76,7 +75,7 @@ class VoorbeeldScript : MonoBehaviour
         return FMOD.RESULT.OK;
     }
 
-    void Start()
+    private void Awake()
     {
         CreateDSP();
     }

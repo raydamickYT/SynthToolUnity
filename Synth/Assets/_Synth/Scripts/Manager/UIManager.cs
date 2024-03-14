@@ -17,7 +17,7 @@ public class UIManager : MonoBehaviour
     }
     private void Initialization()
     {
-        SynthIsPlaying = voorbeeldScript.DSPIsActive;
+        voorbeeldScript.mCaptureDSP.getActive(out SynthIsPlaying);
 
         VolumeSlider.value = voorbeeldScript.sineFrequency;
         VolumeSlider.onValueChanged.AddListener(ChangeFreq);
@@ -59,6 +59,9 @@ public class UIManager : MonoBehaviour
             case 2: //square
                 voorbeeldScript.CurrentWaveForm = WaveForm.Square;
                 break;
+            case 3: //triangle
+                voorbeeldScript.CurrentWaveForm = WaveForm.Triangle;
+                break;
             default:
                 break;
         }
@@ -68,7 +71,7 @@ public class UIManager : MonoBehaviour
     {
         Debug.Log("synth staat aan");
         // Synth.instance.CreateCustomDSP();
-        Synth.instance.myDsp.setActive(true); // zet de dsp op actief.
+        voorbeeldScript.mCaptureDSP.setActive(true); // zet de dsp op actief.
 
     }
 
@@ -76,7 +79,7 @@ public class UIManager : MonoBehaviour
     {
         Debug.Log("synth staat uit");
         // Synth.instance.GlobalDSP.release();
-        Synth.instance.myDsp.setActive(false); // zet de dsp op inactief. 
+        voorbeeldScript.mCaptureDSP.setActive(false); // zet de dsp op inactief. 
     }
 
     private void ChangeFreq(float vol)
