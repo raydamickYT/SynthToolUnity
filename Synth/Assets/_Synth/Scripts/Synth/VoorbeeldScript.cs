@@ -22,6 +22,7 @@ class VoorbeeldScript : MonoBehaviour
     [AOT.MonoPInvokeCallback(typeof(FMOD.DSP_READ_CALLBACK))]
     public static FMOD.RESULT CaptureDSPReadCallback(ref FMOD.DSP_STATE dsp_state, IntPtr inbuffer, IntPtr outbuffer, uint length, int inchannels, ref int outchannels)
     {
+        //hiermee halen we de data op die we megeven aan deze callback
         FMOD.DSP_STATE_FUNCTIONS functions = (FMOD.DSP_STATE_FUNCTIONS)Marshal.PtrToStructure(dsp_state.functions, typeof(FMOD.DSP_STATE_FUNCTIONS));
 
         IntPtr userData;
@@ -31,14 +32,33 @@ class VoorbeeldScript : MonoBehaviour
         VoorbeeldScript obj = objHandle.Target as VoorbeeldScript;
 
         // Save the channel count out for the update function
-        // obj.mChannels = inchannels;
-
+        obj.mChannels = inchannels;
         //geluid
-        float[] tempBuffer = new float[length * inchannels];
-        Marshal.Copy(inbuffer, tempBuffer, 0, tempBuffer.Length);
+        // float[] tempBuffer = new float[length * inchannels];
+        float[] tempBuffer = new float[length * obj.mChannels];
 
-        //todo: KRIJG GELUID UIT DIT KANKER DING
-        // Genereren van een sinusgolf en toevoegen aan de tempBuffer
+        // // Genereren van een sinusgolf en toevoegen aan de tempBuffer
+        // for (int i = 0; i < length; i++)
+        // {
+        //     // Bereken de fase increment
+        //     float phaseIncrement = (2f * Mathf.PI * obj.sineFrequency) / obj.sampleRate;
+
+        //     // Genereer de sinustoon voor dit sample
+        //     float sineSample = Mathf.Sin(obj.phase);
+
+        //     // Update de fase
+        //     obj.phase += phaseIncrement;
+        //     if (obj.phase > 2f * Mathf.PI)
+        //     {
+        //         obj.phase -= 2f * Mathf.PI;
+        //     }
+
+        //     // Toevoegen aan zowel linker als rechter kanaal indien stereo, of alleen linker indien mono
+        //     for (int channel = 0; channel < obj.mChannels; channel++)
+        //     {
+        //         tempBuffer[i * obj.mChannels + channel] = sineSample;
+        //     }
+        // }
         for (uint sampleIndex = 0; sampleIndex < length; sampleIndex++)
         {
             float sampleValue = 0f;
@@ -46,23 +66,6 @@ class VoorbeeldScript : MonoBehaviour
             {
                 case WaveForm.Sine:
                     sampleValue = obj.GenerateSineWave(obj.sineFrequency, (uint)obj.sampleRate, ref obj.phase, sampleIndex);
-                    Debug.Log(sampleValue);
-                    // for (int i = 0; i < length; i++)
-                    // {
-                    //     float sineSample = Mathf.Sin(2f * Mathf.PI * obj.sineFrequency * obj.phase);
-                    //     tempBuffer[i * inchannels] += sineSample; // Voeg toe aan het linker kanaal
-
-                    //     if (inchannels > 1)
-                    //     {
-                    //         tempBuffer[i * inchannels + 1] += sineSample; // Voeg toe aan het rechter kanaal als stereo
-                    //     }
-
-                    //     obj.phase += obj.sineFrequency / obj.sampleRate;
-                    //     if (obj.phase >= 1f)
-                    //     {
-                    //         obj.phase -= 1f;
-                    //     }
-                    // }
                     break;
                 case WaveForm.Sawtooth:
                     sampleValue = obj.GenerateSawtoothWave(sampleIndex, length);
@@ -78,18 +81,18 @@ class VoorbeeldScript : MonoBehaviour
                     sampleValue = obj.GenerateTriangleWave(sampleIndex, length);
                     break;
             }
+            for (int channel = 0; channel < outchannels; channel++)
+            {
+                // Copy the incoming buffer to process later
+                tempBuffer[sampleIndex * outchannels + channel] = sampleValue; //bereken de juiste index in tempbuffer, waar de sample value wordt opgeslagen
+                //voor stereo channels vermenigvuldigt het met *2 (twee output kanalen), en voegt channel toe aan deze waarde (oftewel links, channel 0, recht, channel 1).
+            }
         }
 
         //--------
-
-        // Copy the incoming buffer to process later
-        int lengthElements = (int)length * inchannels;
-        Marshal.Copy(inbuffer, obj.mDataBuffer, 0, lengthElements);
-
-
         // Copy the inbuffer to the outbuffer so we can still hear it
-        // Marshal.Copy(obj.mDataBuffer, 0, outbuffer, lengthElements);
-        Marshal.Copy(tempBuffer, 0, outbuffer, tempBuffer.Length);
+        // Vul het geheugen met de gegenereerde sample voor alle kanalen.
+        Marshal.Copy(tempBuffer, 0, outbuffer, tempBuffer.Length);// kopieer de buffer naar de geheugen
 
         return FMOD.RESULT.OK;
     }
@@ -152,7 +155,6 @@ class VoorbeeldScript : MonoBehaviour
         float sample = Mathf.Sin(phase);
         float phaseIncrement = 2f * Mathf.PI * frequency / sampleRate;
         phase += phaseIncrement;
-        // Zorg ervoor dat de fase niet te groot wordt
         if (phase >= 2f * Mathf.PI) phase -= 2f * Mathf.PI;
 
         return sample;
