@@ -27,7 +27,10 @@ public class DSPCallback
 
         //-------------------------
         //geluid
+        // Pas de gain toe op elke sample
         obj.sharedBuffer = new float[length * obj.mChannels];
+
+
         for (uint sampleIndex = 0; sampleIndex < length; sampleIndex++)
         {
             float sampleValue = 0f;
@@ -47,11 +50,12 @@ public class DSPCallback
                     break;
                 case WaveForm.Triangle:
                     // Bereken de driehoeksgolf sample
-                    sampleValue = obj.GenerateTriangleWave(sampleIndex, (uint)obj.sampleRate, obj.sineFrequency);
+                    sampleValue = obj.GenerateTriangleWave(sampleIndex, (uint)obj.sampleRate, obj.sineFrequency, ref obj.phase);
                     break;
             }
             for (int channel = 0; channel < outchannels; channel++)
             {
+
                 // Copy the incoming buffer to process later
                 obj.sharedBuffer[sampleIndex * outchannels + channel] = sampleValue; //bereken de juiste index in tempbuffer, waar de sample value wordt opgeslagen
                 obj.savedSampleValue = sampleValue;

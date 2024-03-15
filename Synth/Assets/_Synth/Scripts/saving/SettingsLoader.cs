@@ -61,6 +61,6 @@ public class SettingsLoader
 
         //uimanager updaten
         uIManager.ChangeWave.value = (int)_state.CurrentWaveForm;
-        uIManager.VolumeSlider.value = _state.Frequency;
+        uIManager.FrequencySlider.value = _state.Frequency;
     }
 }

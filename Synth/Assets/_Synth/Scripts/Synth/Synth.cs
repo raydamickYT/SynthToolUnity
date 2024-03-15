@@ -5,7 +5,9 @@ using System.Runtime.InteropServices;
 
 public class Synth : MonoBehaviour
 {
-    CreateSynth createSynth;
+    private FMOD.ChannelGroup masterCG;
+    [Range(0f, 1f)]
+    public float volume = 0.5f; // Standaard volume op 50%
     public float savedSampleValue;
     public bool DSPIsActive = false;
     public FMOD.DSP_READ_CALLBACK mReadCallback;
@@ -23,7 +25,6 @@ public class Synth : MonoBehaviour
 
     private void Awake()
     {
-        createSynth = new(this);
         CheckAudioSettings();
         CreateDSP();
     }
@@ -53,7 +54,6 @@ public class Synth : MonoBehaviour
             desc.userdata = GCHandle.ToIntPtr(mObjHandle);
 
             // Create an instance of the capture DSP and attach it to the master channel group to capture all audio
-            FMOD.ChannelGroup masterCG;
             if (FMODUnity.RuntimeManager.CoreSystem.getMasterChannelGroup(out masterCG) == FMOD.RESULT.OK)
             {
 
@@ -101,19 +101,6 @@ public class Synth : MonoBehaviour
         Debug.Log("Speaker Mode: " + speakerMode);
     }
 
-    Texture2D GenerateWaveformTexture(float[] audioSamples, int width, int height)
-    {
-        Texture2D texture = new Texture2D(width, height);
-        for (int x = 0; x < width; x++)
-        {
-            float sample = audioSamples[(int)(((float)x / width) * audioSamples.Length)];
-            int y = (int)((sample + 1f) / 2f * (height - 1));  // Normalize sample to 0..height
-            texture.SetPixel(x, y, Color.black);
-        }
-        texture.Apply();
-        return texture;
-    }
-
     void Update()
     {
         float[] bufferCopy;
@@ -123,8 +110,6 @@ public class Synth : MonoBehaviour
             Array.Copy(sharedBuffer, bufferCopy, sharedBuffer.Length);
         }
         WaveformVisualizer.instance.UpdateWaveform(bufferCopy);
-
-
     }
     private void LateUpdate()
     {
@@ -139,7 +124,7 @@ public class Synth : MonoBehaviour
         phase += phaseIncrement;
         if (phase >= 2f * Mathf.PI) phase -= 2f * Mathf.PI;
 
-        return sample;
+        return sample * volume;
     }
 
     public float GenerateSawtoothWave(float frequency, uint sampleRate, ref float phase, uint index)
@@ -158,7 +143,7 @@ public class Synth : MonoBehaviour
         // De fase loopt lineair op, dus we mappen deze direct naar onze output
         float sawtooth = (phase / (2f * Mathf.PI)) * 2f - 1f;
 
-        return sawtooth;
+        return sawtooth * volume;
     }
 
 
@@ -181,41 +166,44 @@ public class Synth : MonoBehaviour
         float position = (index + phase / phaseIncrement) % period;
 
         // De golf wisselt tussen 1 en -1 halverwege elke periode
-        return position < period / 2 ? 1f : -1f;
+        return (position < period / 2 ? 1f : -1f) * volume;
     }
-
-    public float GenerateTriangleWave(uint index, uint sampleRate, float frequency)
+    public float GenerateTriangleWave(uint index, uint sampleRate, float frequency, ref float phase)
     {
-        // Bereken de periode van de golf
+        // Bereken de golfperiode
         float period = sampleRate / frequency;
 
-        // Bereken de positie in de huidige periode
-        float position = (index % period) / period;
+        // Fase in termen van perioden omzetten
+        float phaseInTermsOfPeriod = phase / (2f * Mathf.PI) * period;
 
-        // Bereken de waarde van de driehoeksgolf gebaseerd op de positie binnen de periode
+        // Rekening houden met de fase in de positieberekening
+        // De modulo zorgt ervoor dat de waarde binnen de golfperiode blijft
+        float position = (index + phaseInTermsOfPeriod) % period / period;
+
+        // Formule voor de driehoeksgolf aangepast om fase te incorporeren
         if (position < 0.25f)
-            return 4f * position; // Oplopend van 0 naar 1
+            return (4f * position) * volume; // Oplopend van 0 naar 1
         else if (position < 0.75f)
-            return 2f - 4f * position; // Aflopend van 1 naar -1
+            return (2f - 4f * position) * volume; // Aflopend van 1 naar -1
         else
-            return -4f + 4f * position; // Oplopend van -1 naar 0
+            return (-4f + 4f * position) * volume; // Oplopend van -1 naar 0
     }
+
 
 
 
     void OnDestroy()
     {
+        //release je dsp en group
         if (mObjHandle != null)
         {
-            // Remove the capture DSP from the master channel group
-            FMOD.ChannelGroup masterCG;
             if (FMODUnity.RuntimeManager.CoreSystem.getMasterChannelGroup(out masterCG) == FMOD.RESULT.OK)
             {
                 if (mCaptureDSP.hasHandle())
                 {
                     masterCG.removeDSP(mCaptureDSP);
 
-                    // Release the DSP and free the object handle
+                    // nu kan je eindelijk je dsp zonder problemen releasen
                     mCaptureDSP.release();
                 }
             }

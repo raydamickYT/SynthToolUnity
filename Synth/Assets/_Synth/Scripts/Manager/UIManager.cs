@@ -15,7 +15,7 @@ public class UIManager : MonoBehaviour
 
     public Button OnOffBtn;
     public Dropdown ChangeWave, dropdown;
-    public Slider VolumeSlider;
+    public Slider FrequencySlider, VolumeSlider;
     private bool SynthIsPlaying = true;
 
     private void Start()
@@ -26,8 +26,11 @@ public class UIManager : MonoBehaviour
     {
         voorbeeldScript.mCaptureDSP.getActive(out SynthIsPlaying);
 
-        VolumeSlider.value = voorbeeldScript.sineFrequency;
-        VolumeSlider.onValueChanged.AddListener(ChangeFreq);
+        FrequencySlider.value = voorbeeldScript.sineFrequency;
+        FrequencySlider.onValueChanged.AddListener(ChangeFreq);
+
+        VolumeSlider.value = voorbeeldScript.volume;
+        VolumeSlider.onValueChanged.AddListener(ChageVol);
 
         ChangeWave.onValueChanged.AddListener(delegate
         {
@@ -128,9 +131,12 @@ public class UIManager : MonoBehaviour
     private void ChangeFreq(float vol)
     {
         voorbeeldScript.sineFrequency = vol;
-        
     }
 
+    private void ChageVol(float vol)
+    {
+        voorbeeldScript.volume = vol;
+    }
 
     public void StartRecording()
     {
