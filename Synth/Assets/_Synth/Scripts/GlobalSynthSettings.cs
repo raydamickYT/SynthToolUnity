@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
 public class GlobalSynthSettings : MonoBehaviour
@@ -9,13 +6,20 @@ public class GlobalSynthSettings : MonoBehaviour
     public bool DSPIsActive = false;
     public WaveForm CurrentWaveForm = WaveForm.Sawtooth; // Standaard golfvorm
     public int mChannels = 0;
-    public float sineFrequency = 440f; // Frequentie van de sinusgolf in Hz
-    public int sampleRate = 48000; // Stel dit in op de daadwerkelijke sample rate van je systeem
+    public float Frequency = 440f; // Frequentie van de sinusgolf in Hz
+    public int SampleRate = 48000; // Stel dit in op de daadwerkelijke sample rate van je systeem
 
     // Start is called before the first frame update
     private void Awake()
     {
-        instance = this;
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(this);
+        }
     }
 
     void OnDestroy()
@@ -28,7 +32,7 @@ public class GlobalSynthSettings : MonoBehaviour
         DSPIsActive = isactive;
         CurrentWaveForm = current;
         mChannels = channels;
-        sineFrequency = sincefreq;
-        sampleRate = sample;
+        Frequency = sincefreq;
+        SampleRate = sample;
     }
 }

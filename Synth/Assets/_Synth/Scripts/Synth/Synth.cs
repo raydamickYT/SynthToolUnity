@@ -1,59 +1,90 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using FMODUnity;
 using System;
 using System.Runtime.InteropServices;
-using Unity.VisualScripting;
 
 public class Synth : MonoBehaviour
 {
-    //fmod
+    CreateSynth createSynth;
+    public float savedSampleValue;
+    public bool DSPIsActive = false;
+    public FMOD.DSP_READ_CALLBACK mReadCallback;
+    public FMOD.DSP mCaptureDSP;
+    public float[] mDataBuffer, sharedBuffer;
+    private readonly object bufferLock = new object();
 
+    public GCHandle mObjHandle;
+    public WaveForm CurrentWaveForm = WaveForm.Sawtooth; // Standaard golfvorm
+    public uint mBufferLength;
+    public int mChannels = 0;
+    public float sineFrequency = 440f; // Frequentie van de sinusgolf in Hz
+    public float phase = 0f; // Fase van de sinusgolf
+    public int sampleRate = 48000; // Stel dit in op de daadwerkelijke sample rate van je systeem
 
-
-    public static Synth instance;
-    public float frequency = 440f; // A4 noot
-    private float increment;
-    private float phase = 0;
-    private int sampling_frequency; //dit is alleen om te kijken wat de freq is nu
-    public string DspNames = "";
-
-    //static vars
-    // Houd bij welke golfvorm momenteel wordt gebruikt.
-    public static WaveForm currentWaveForm = WaveForm.Sine;
-
-    GCHandle handle;
-    public FMOD.DSP myDsp;
-
-
-    void Start()
+    private void Awake()
     {
-
-        // FMOD.DSP_READ_CALLBACK mReadCallback;
-
-
-        // Andere setup of initialisatiecode hier...
+        createSynth = new(this);
+        CheckAudioSettings();
+        CreateDSP();
     }
-
-    void Awake()
+    public void CreateDSP()
     {
+        // Assign the callback to a member variable to avoid garbage collection
+        mReadCallback = DSPCallback.CaptureDSPReadCallback;
 
-        if (instance == null)
+        // Allocate a data buffer large enough for 8 channels
+        uint bufferLength;
+        int numBuffers;
+        FMODUnity.RuntimeManager.CoreSystem.getDSPBufferSize(out bufferLength, out numBuffers);
+        mDataBuffer = new float[bufferLength * 8];
+        mBufferLength = bufferLength;
+
+        // Get a handle to this object to pass into the callback
+        // SynthState synthState = new(sineFrequency, (uint)sampleRate, mDataBuffer);
+
+        mObjHandle = GCHandle.Alloc(this);
+        if (mObjHandle != null)
         {
-            instance = this;
-            // DontDestroyOnLoad(this);
+            // Define a basic DSP that receives a callback each mix to capture audio
+            FMOD.DSP_DESCRIPTION desc = new FMOD.DSP_DESCRIPTION();
+            desc.numinputbuffers = 1;
+            desc.numoutputbuffers = 1;
+            desc.read = mReadCallback;
+            desc.userdata = GCHandle.ToIntPtr(mObjHandle);
+
+            // Create an instance of the capture DSP and attach it to the master channel group to capture all audio
+            FMOD.ChannelGroup masterCG;
+            if (FMODUnity.RuntimeManager.CoreSystem.getMasterChannelGroup(out masterCG) == FMOD.RESULT.OK)
+            {
+
+                if (FMODUnity.RuntimeManager.CoreSystem.createDSP(ref desc, out mCaptureDSP) == FMOD.RESULT.OK) //hier wordt de dsp aangemaakt
+                {
+                    mCaptureDSP.setActive(false); //zet hem tijdelijk op inactief, dan kunnen we dat later aanpassen.
+                    mCaptureDSP.getActive(out DSPIsActive); //sla het gelijk op zodat we het in andere scripts kunnen gebruiken.
+                    if (masterCG.addDSP(FMOD.CHANNELCONTROL_DSP_INDEX.HEAD, mCaptureDSP) != FMOD.RESULT.OK) //hier voegen we hem toe aan de mastergroup (hierdoor kunnen we hem horen.)
+                    {
+                        Debug.LogWarningFormat("FMOD: Unable to add mCaptureDSP to the master channel group");
+                    }
+                    else
+                    {
+                        masterCG.getNumChannels(out int channels);
+                        Debug.Log(channels);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarningFormat("FMOD: Unable to create a DSP: mCaptureDSP");
+                }
+            }
+            else
+            {
+                Debug.LogWarningFormat("FMOD: Unable to create a master channel group: masterCG");
+            }
         }
         else
         {
-            Destroy(this); //als er een duplicate is willen we dat het nieuwe object verwijdert wordt.
+            Debug.LogWarningFormat("FMOD: Unable to create a GCHandle: mObjHandle");
         }
-        CheckAudioSettings();
-        CreateCustomDSP();
-        handle = GCHandle.Alloc(this, GCHandleType.Weak);
-        IntPtr ptr = (IntPtr)handle;
-        myDsp.setUserData(ptr);
-
     }
     void CheckAudioSettings()
     {
@@ -63,175 +94,132 @@ public class Synth : MonoBehaviour
         int raw;
 
         // krijg de huidige softwareformat instellingen
-        system.getSoftwareFormat(out sampling_frequency, out speakerMode, out raw);
+        system.getSoftwareFormat(out sampleRate, out speakerMode, out raw);
 
         // Output de waarden naar de console voor debugging
-        Debug.Log("Sample Rate: " + sampling_frequency);
+        Debug.Log("Sample Rate: " + sampleRate);
         Debug.Log("Speaker Mode: " + speakerMode);
     }
-    public void CreateCustomDSP()
+
+    Texture2D GenerateWaveformTexture(float[] audioSamples, int width, int height)
     {
-        FMOD.DSP_DESCRIPTION dspDescription = new FMOD.DSP_DESCRIPTION();
-
-        // Zet de naam van de DSP om naar een byte array
-        string dspName = "MijnDSP";
-        byte[] nameBytes = System.Text.Encoding.UTF8.GetBytes(dspName);
-
-        // FMOD verwacht dat de naam afgesloten wordt met een null-byte ('\0'), dus voeg die toe.
-        byte[] nameWithNullByte = new byte[nameBytes.Length + 1];
-        Array.Copy(nameBytes, nameWithNullByte, nameBytes.Length);
-        nameWithNullByte[nameWithNullByte.Length - 1] = 0; // Voeg null-byte toe aan het einde
-
-        dspDescription.name = nameWithNullByte; // Zorg ervoor dat de naam eindigt met een null-terminator
-                                                //.read is blijkbaar een delegate...
-        dspDescription.read = DSPReadCallback; //zal altijd een float terug krijgen, dit zorgt voor andere geluiden.
-
-        FMOD.RESULT result; //in deze var wordt het resultaat zo opgeslagen (ok, error)
-        result = RuntimeManager.CoreSystem.createDSP(ref dspDescription, out myDsp); //maak de dsp met alle info die we net in het description obj hebben gestopt.
-        if (result != FMOD.RESULT.OK) //check even of de task wel completed is.
+        Texture2D texture = new Texture2D(width, height);
+        for (int x = 0; x < width; x++)
         {
-            Debug.LogError("Failed to create DSP: " + result);
-            return;
+            float sample = audioSamples[(int)(((float)x / width) * audioSamples.Length)];
+            int y = (int)((sample + 1f) / 2f * (height - 1));  // Normalize sample to 0..height
+            texture.SetPixel(x, y, Color.black);
         }
-        //geef userdata mee
-        // SynthState synthState = new(frequency, (uint)sampling_frequency, phase);
-        // GCHandle handle = GCHandle.Alloc(synthState, GCHandleType.Pinned);
-
-        IntPtr userDataPtr = GCHandle.ToIntPtr(handle);
-        myDsp.setUserData(userDataPtr);
-
-        FMOD.ChannelGroup masterGroup;
-        RuntimeManager.CoreSystem.getMasterChannelGroup(out masterGroup);
-        masterGroup.addDSP(FMOD.CHANNELCONTROL_DSP_INDEX.HEAD, myDsp);
-
-        // activeer je dsp
-        myDsp.setBypass(false); // false: hij wordt niet bypassed
-        /*
-        wat de bypass doet is dat deze dsp wordt overgeslagen bij het afspelen. hij blijft in de verwerkingsketen, dit is handig als je 
-        de dsp vaak aan en uit wilt zetten. Het is niet heel zuinig (omdat hij blijft doorwerken in de achtergrond). 
-        */
-        myDsp.setActive(false); //false: hij wordt niet aangezet
-        /*
-        Setactive is voor dsp's hetzelfde als met game objecten: hij is niet actief en wordt dus niet uitgevoerd. Zuinig en snel, naar mijn mening is de de beste manier voor 
-        dit project om de dsp's te toggelen.
-        */
+        texture.Apply();
+        return texture;
     }
 
-
-    // DSP Read Callback
-    [AOT.MonoPInvokeCallback(typeof(FMOD.DSP_READ_CALLBACK))]
-    public static FMOD.RESULT DSPReadCallback(ref FMOD.DSP_STATE dsp_state, IntPtr inbuffer, IntPtr outbuffer, uint length, int inchannels, ref int outchannels)
+    void Update()
     {
-        // Een buffer voor de samples.
-        float[] buffer = new float[length * outchannels];
-        FMOD.DSP_STATE_FUNCTIONS functions = (FMOD.DSP_STATE_FUNCTIONS)Marshal.PtrToStructure(dsp_state.functions, typeof(FMOD.DSP_STATE_FUNCTIONS));
-
-        IntPtr userData;
-        functions.getuserdata(ref dsp_state, out userData);
-
-        GCHandle objHandle = GCHandle.FromIntPtr(userData);
-        SynthState obj = objHandle.Target as SynthState;
-        Debug.Log("obj");
-
-        for (uint sampleIndex = 0; sampleIndex < length; sampleIndex++)
+        float[] bufferCopy;
+        lock (bufferLock)
         {
-            float sampleValue = 0f;
-            switch (currentWaveForm)
-            {
-                case WaveForm.Sine:
-                    // Genereer een sinusgolf sample.
-                    // sampleValue = GenerateSineWave(sampleIndex, length);
-                    sampleValue = GenerateSineWave(instance.frequency, (uint)instance.sampling_frequency, ref instance.phase, sampleIndex);
-
-                    break;
-                case WaveForm.Sawtooth:
-                    // Genereer een zaagtandgolf sample.
-                    sampleValue = GenerateSawtoothWave(sampleIndex, length);
-                    break;
-                case WaveForm.Square:
-                    // Genereer een vierkantgolf sample.
-                    sampleValue = GenerateSquareWave(sampleIndex, length);
-                    break;
-                case WaveForm.Triangle:
-                    // Genereer een driehoeksgolf sample.
-                    sampleValue = GenerateTriangleWave(sampleIndex, length);
-                    break;
-            }
-
-            // Vul de buffer met de gegenereerde sample voor alle kanalen.
-            for (int channel = 0; channel < outchannels; channel++)
-            {
-                buffer[sampleIndex * outchannels + channel] = sampleValue;
-            }
+            bufferCopy = new float[sharedBuffer.Length];
+            Array.Copy(sharedBuffer, bufferCopy, sharedBuffer.Length);
         }
+        WaveformVisualizer.instance.UpdateWaveform(bufferCopy);
 
-        // Kopieer de buffer terug naar outbuffer.
-        Marshal.Copy(buffer, 0, outbuffer, buffer.Length);
 
-        return FMOD.RESULT.OK;
+    }
+    private void LateUpdate()
+    {
+        //sla de settings op in een ander script waar iedereen bij kan.
+        GlobalSynthSettings.instance.UpdateSettings(DSPIsActive, CurrentWaveForm, mChannels, sineFrequency, sampleRate);
     }
 
-    public static float GenerateSineWave(float frequency, uint sampleRate, ref float phase, uint index)
+    public float GenerateSineWave(float frequency, uint sampleRate, ref float phase, uint index)
     {
         float sample = Mathf.Sin(phase);
         float phaseIncrement = 2f * Mathf.PI * frequency / sampleRate;
         phase += phaseIncrement;
-        // Zorg ervoor dat de fase niet te groot wordt
         if (phase >= 2f * Mathf.PI) phase -= 2f * Mathf.PI;
 
         return sample;
     }
 
-    static float GenerateSawtoothWave(uint index, uint length)
+    public float GenerateSawtoothWave(float frequency, uint sampleRate, ref float phase, uint index)
     {
-        // Implementeer zaagtandgolf generatie.
-        return 2f * (index / (float)length) - 1f;
+        // Bereken de fase-increment per sample
+        float phaseIncrement = 2f * Mathf.PI * frequency / sampleRate;
+
+        // Verhoog de fase met de increment
+        phase += phaseIncrement;
+
+        // Normaliseer de fase zodat deze altijd tussen 0 en 2π blijft
+        if (phase >= 2f * Mathf.PI)
+            phase -= 2f * Mathf.PI;
+
+        // Bereken de zaagtandwaarde, gemapt van fase naar een waarde tussen -1 en 1
+        // De fase loopt lineair op, dus we mappen deze direct naar onze output
+        float sawtooth = (phase / (2f * Mathf.PI)) * 2f - 1f;
+
+        return sawtooth;
     }
 
-    static float GenerateSquareWave(uint index, uint length)
+
+
+    public float GenerateSquareWave(uint index, uint sampleRate, float frequency, ref float phase)
     {
-        // Implementeer vierkantgolf generatie.
-        return index < length / 2 ? 1f : -1f;
+        // Bereken de fase-increment per sample
+        float phaseIncrement = 2f * Mathf.PI * frequency / sampleRate;
+
+        // Verhoog de fase met de increment
+        phase += phaseIncrement;
+
+        // Normaliseer de fase zodat deze altijd tussen 0 en 2π blijft
+        if (phase >= 2f * Mathf.PI) phase -= 2f * Mathf.PI;
+
+
+        // Bereken de periode van de golf
+        float period = sampleRate / frequency;
+        // Bereken de positie in de huidige periode
+        float position = (index + phase / phaseIncrement) % period;
+
+        // De golf wisselt tussen 1 en -1 halverwege elke periode
+        return position < period / 2 ? 1f : -1f;
     }
 
-    static float GenerateTriangleWave(uint index, uint length)
+    public float GenerateTriangleWave(uint index, uint sampleRate, float frequency)
     {
-        // Implementeer driehoeksgolf generatie.
-        float position = (index / (float)length) * 4f;
-        if (position < 2f) return position - 1f;
-        else return 3f - position;
+        // Bereken de periode van de golf
+        float period = sampleRate / frequency;
+
+        // Bereken de positie in de huidige periode
+        float position = (index % period) / period;
+
+        // Bereken de waarde van de driehoeksgolf gebaseerd op de positie binnen de periode
+        if (position < 0.25f)
+            return 4f * position; // Oplopend van 0 naar 1
+        else if (position < 0.75f)
+            return 2f - 4f * position; // Aflopend van 1 naar -1
+        else
+            return -4f + 4f * position; // Oplopend van -1 naar 0
     }
 
 
+
+    void OnDestroy()
+    {
+        if (mObjHandle != null)
+        {
+            // Remove the capture DSP from the master channel group
+            FMOD.ChannelGroup masterCG;
+            if (FMODUnity.RuntimeManager.CoreSystem.getMasterChannelGroup(out masterCG) == FMOD.RESULT.OK)
+            {
+                if (mCaptureDSP.hasHandle())
+                {
+                    masterCG.removeDSP(mCaptureDSP);
+
+                    // Release the DSP and free the object handle
+                    mCaptureDSP.release();
+                }
+            }
+            mObjHandle.Free();
+        }
+    }
 }
-public enum WaveForm
-{
-    Sine,
-    Sawtooth,
-    Square,
-    Triangle
-}
-
-public class SynthState
-{
-    public float Frequency;
-    public uint SamplingFrequency;
-    public float CarrierPhase;
-    public float[] mDataBuffer;
-    public WaveForm CurrentWaveForm { get; internal set; }
-
-    public SynthState()
-    {
-        Frequency = 0;
-        SamplingFrequency = 0;
-        CurrentWaveForm = WaveForm.Sine; //sine is gwn de default
-    }
-    public SynthState(float frequency, uint samplingFrequency, WaveForm _current)
-    {
-        Frequency = frequency;
-        SamplingFrequency = samplingFrequency;
-        CurrentWaveForm = _current;
-    }
-
-}
-

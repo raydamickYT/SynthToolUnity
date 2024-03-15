@@ -6,9 +6,9 @@ using UnityEngine.UI;
 
 public class SaveSettings : MonoBehaviour
 {
-    GlobalSynthSettings globalSynthSettings;
-    SettingsSaver settingsSaver = new();
-    SettingsLoader settingsLoader = new();
+    private GlobalSynthSettings globalSynthSettings;
+    private SettingsSaver settingsSaver = new();
+    private SettingsLoader settingsLoader = new();
     private Dropdown dropdown;
     private Button button;
     // Start is called before the first frame update
@@ -48,7 +48,7 @@ public class SaveSettings : MonoBehaviour
 
     public void SaveSynthSettings()
     {
-        SynthState synthState = new SynthState(globalSynthSettings.sineFrequency, (uint)globalSynthSettings.sampleRate, globalSynthSettings.CurrentWaveForm);
+        SynthState synthState = new SynthState(globalSynthSettings.Frequency, (uint)globalSynthSettings.SampleRate, globalSynthSettings.CurrentWaveForm);
         settingsSaver.SaveSettingsWithFileDialog(synthState);
     }
 

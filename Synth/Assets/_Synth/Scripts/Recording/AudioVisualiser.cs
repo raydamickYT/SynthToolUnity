@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class AudioDataProcessor : MonoBehaviour
 {
-    [SerializeField] private VoorbeeldScript voorbeeldScript;
+    [SerializeField] private Synth voorbeeldScript;
     // Veronderstel dat deze buffer gevuld wordt met audio-data van je DSP callback
     private float[] audioDataBuffer;
     private int bufferSize = 1024; // Een voorbeeld buffer grootte, pas aan aan je DSP configuratie

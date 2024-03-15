@@ -10,7 +10,7 @@ using System.Collections.Generic; // standalone file browser
 
 public class AudioRecorder : MonoBehaviour
 {
-    [SerializeField] VoorbeeldScript voorbeeldScript;
+    [SerializeField] Synth voorbeeldScript;
     [SerializeField] private int sampleRate = 44100; // Standaard sample rate
     private FMOD.System system; // FMOD low-level system instance
     private FMOD.Sound sound; // Sound object to hold the recording
