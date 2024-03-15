@@ -1933,6 +1933,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8765f324a45f9b04396136862f708d22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  settingsLoader: {fileID: 1579977275}
 --- !u!1 &696586728
 GameObject:
   m_ObjectHideFlags: 0
@@ -2869,6 +2870,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   voorbeeldScript: {fileID: 1902281661}
+  audioDataBuffer: []
+  bufferSize: 1024
 --- !u!1 &1154182890
 GameObject:
   m_ObjectHideFlags: 0
@@ -4260,6 +4263,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1579977273}
   - component: {fileID: 1579977274}
+  - component: {fileID: 1579977275}
   m_Layer: 0
   m_Name: UImanager
   m_TagString: Untagged
@@ -4294,13 +4298,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ba29e73f33e2e64681ced16b1bf08dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  voorbeeldScript: {fileID: 1902281661}
   audioRecorder: {fileID: 1148246696}
   OnOffBtn: {fileID: 1767148217}
   ChangeWave: {fileID: 369912527}
   dropdown: {fileID: 1719380046}
   FrequencySlider: {fileID: 1366844110}
   VolumeSlider: {fileID: 1817506969}
+--- !u!114 &1579977275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1579977272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9eef0e52070702b4e86d099194d956f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uIManager: {fileID: 1579977274}
 --- !u!1 &1594573875
 GameObject:
   m_ObjectHideFlags: 0
@@ -5808,17 +5824,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fa0f6e617c66d540887fe7388d6ca5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  volume: 0.5
-  savedSampleValue: 0
-  DSPIsActive: 0
-  mDataBuffer: []
-  sharedBuffer: []
-  CurrentWaveForm: 0
-  mBufferLength: 0
-  mChannels: 0
-  sineFrequency: 440
-  phase: 0
-  sampleRate: 48000
 --- !u!114 &1902281662
 MonoBehaviour:
   m_ObjectHideFlags: 0

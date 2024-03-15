@@ -1,19 +1,13 @@
-using System.Collections.Generic;
 using FMODUnity;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.iOS;
-using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
 
 
 public class UIManager : MonoBehaviour
 {
+    private SynthInfo SynthInfo;
     public static int RecordIndex = 0;
-    [SerializeField] private Synth voorbeeldScript;
-    private SynthInfo synthState;
     [SerializeField] private AudioRecorder audioRecorder;
-
     public Button OnOffBtn;
     public Dropdown ChangeWave, dropdown;
     public Slider FrequencySlider, VolumeSlider;
@@ -21,17 +15,17 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        synthState = SynthInfo.instance;
+        SynthInfo = SynthInfo.instance;
         Initialization();
     }
     private void Initialization()
     {
-        synthState.mCaptureDSP.getActive(out SynthIsPlaying);
+        SynthInfo.mCaptureDSP.getActive(out SynthIsPlaying);
 
-        FrequencySlider.value = synthState.sineFrequency;
+        FrequencySlider.value = SynthInfo.sineFrequency;
         FrequencySlider.onValueChanged.AddListener(ChangeFreq);
 
-        VolumeSlider.value = synthState.volume;
+        VolumeSlider.value = SynthInfo.volume;
         VolumeSlider.onValueChanged.AddListener(ChageVol);
 
         ChangeWave.onValueChanged.AddListener(delegate
@@ -93,22 +87,22 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void WaveChanged(Dropdown change)
+    public void WaveChanged(Dropdown change)
     {
         Debug.Log("dropdown changed to value: " + change.value);
         switch (change.value)
         {
             case 0: //sine wave
-                synthState.CurrentWaveForm = WaveForm.Sine;
+                SynthInfo.CurrentWaveForm = WaveForm.Sine;
                 break;
             case 1: // sawtooth
-                synthState.CurrentWaveForm = WaveForm.Sawtooth;
+                SynthInfo.CurrentWaveForm = WaveForm.Sawtooth;
                 break;
             case 2: //square
-                synthState.CurrentWaveForm = WaveForm.Square;
+                SynthInfo.CurrentWaveForm = WaveForm.Square;
                 break;
             case 3: //triangle
-                synthState.CurrentWaveForm = WaveForm.Triangle;
+                SynthInfo.CurrentWaveForm = WaveForm.Triangle;
                 break;
             default:
                 break;
@@ -119,7 +113,7 @@ public class UIManager : MonoBehaviour
     {
         Debug.Log("synth staat aan");
         // Synth.instance.CreateCustomDSP();
-        synthState.mCaptureDSP.setActive(true); // zet de dsp op actief.
+        SynthInfo.mCaptureDSP.setActive(true); // zet de dsp op actief.
 
     }
 
@@ -127,17 +121,17 @@ public class UIManager : MonoBehaviour
     {
         Debug.Log("synth staat uit");
         // Synth.instance.GlobalDSP.release();
-        synthState.mCaptureDSP.setActive(false); // zet de dsp op inactief. 
+        SynthInfo.mCaptureDSP.setActive(false); // zet de dsp op inactief. 
     }
 
     private void ChangeFreq(float vol)
     {
-        synthState.sineFrequency = vol;
+        SynthInfo.sineFrequency = vol;
     }
 
     private void ChageVol(float vol)
     {
-        synthState.volume = vol;
+        SynthInfo.volume = vol;
     }
 
     public void StartRecording()

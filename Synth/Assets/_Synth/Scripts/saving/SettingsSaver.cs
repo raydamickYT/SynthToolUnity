@@ -5,8 +5,9 @@ using System;
 using System.IO;
 using Unity.VisualScripting;
 using UnityEditor;
+using SFB;
 
-public class SettingsSaver 
+public class SettingsSaver
 {
 
     // Methode om de instellingen op te slaan
@@ -51,7 +52,14 @@ public class SettingsSaver
     public void SaveSettingsWithFileDialog(SynthInfo _state)
     {
         // Vraag de gebruiker om een bestandspad te kiezen
-        string filePath = EditorUtility.SaveFilePanel("Save Settings", "", "settings.txt", "txt");
+        // ExtensionFilter neemt een array van 'extensions', inclusief een beschrijving en extensies
+        var extensions = new[] {
+        new ExtensionFilter("Text Files", "txt"),
+        new ExtensionFilter("All Files", "*"),
+    };
+
+        // StandaloneFileBrowser.SaveFilePanel retourneert direct het pad als een string
+        string filePath = StandaloneFileBrowser.SaveFilePanel("Save Settings", "", "settings", extensions);
 
         // Controleer of de gebruiker een pad heeft gekozen
         if (!string.IsNullOrEmpty(filePath))

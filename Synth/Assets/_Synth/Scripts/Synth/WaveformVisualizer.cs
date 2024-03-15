@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 public class WaveformVisualizer : MonoBehaviour
 {
-    public static WaveformVisualizer instance;
     public RawImage rawImage; // Verbind dit met je RawImage component in de Inspector
     public int textureWidth = 1024;
     public int textureHeight = 128;
@@ -12,12 +11,27 @@ public class WaveformVisualizer : MonoBehaviour
 
     void Start()
     {
-        instance = this;
         waveformTexture = new Texture2D(textureWidth, textureHeight);
         rawImage.texture = waveformTexture;
         GenerateWaveformTexture(); // Voorbeeldaanroep
     }
-
+    private void Update()
+    {
+        float[] bufferCopy;
+        lock (SynthInfo.instance.bufferLock)
+        {
+            if (SynthInfo.instance.sharedBuffer != null)
+            {
+                bufferCopy = new float[SynthInfo.instance.sharedBuffer.Length];
+                Array.Copy(SynthInfo.instance.sharedBuffer, bufferCopy, SynthInfo.instance.sharedBuffer.Length);
+            }
+            else
+            {
+                bufferCopy = new float[0];
+            }
+        }
+        UpdateWaveform(bufferCopy);
+    }
     void GenerateWaveformTexture()
     {
         // Voorbeeldgegevens: genereer een sinusgolf

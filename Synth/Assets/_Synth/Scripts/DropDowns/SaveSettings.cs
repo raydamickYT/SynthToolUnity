@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using SFB;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -52,18 +53,29 @@ public class SaveSettings : MonoBehaviour
         settingsSaver.SaveSettingsWithFileDialog(synthState);
     }
 
+
     public void LoadSettings()
     {
         SynthInfo synthState = SynthInfo.instance;
 
-        // Vraag de gebruiker om een bestandspad te kiezen
-        string filePath = EditorUtility.OpenFilePanel("Load Settings", "", "txt");
+        // Vraag de gebruiker om een bestand te kiezen om te laden
+        var extensions = new[] {
+        new ExtensionFilter("Text Files", "txt"),
+    };
 
-        // Controleer of de gebruiker een pad heeft gekozen
-        if (!string.IsNullOrEmpty(filePath))
+        // StandaloneFileBrowser.OpenFilePanel retourneert een array van paden, we gebruiken hier de eerste
+        // Let op: OpenFilePanel retourneert een lege array als de gebruiker annuleert
+        string[] paths = StandaloneFileBrowser.OpenFilePanel("Load Settings", "", extensions, false);
+
+        if (paths.Length > 0)
         {
-            // Laad de instellingen vanuit het gekozen bestandspad
-            settingsLoader.LoadSettings(filePath, synthState);
+            // Controleer of een pad is gekozen
+            string filePath = paths[0];
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                // Laad de instellingen vanuit het gekozen bestandspad
+                settingsLoader.LoadSettings(filePath, synthState);
+            }
         }
     }
 

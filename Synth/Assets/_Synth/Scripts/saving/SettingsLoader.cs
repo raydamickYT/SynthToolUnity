@@ -59,7 +59,6 @@ public class SettingsLoader : MonoBehaviour
     void ApplySettings(SynthInfo _state)
     {
         //uimanager updaten
-        Debug.Log(uIManager);
         uIManager.ChangeWave.value = (int)_state.CurrentWaveForm;
         uIManager.FrequencySlider.value = _state.Frequency;
     }

@@ -35,28 +35,6 @@ public class Synth : MonoBehaviour
         Debug.Log("Speaker Mode: " + speakerMode);
     }
 
-    void Update()
-    {
-        float[] bufferCopy;
-        lock (synthState.bufferLock)
-        {
-            if (synthState.sharedBuffer != null)
-            {
-                bufferCopy = new float[synthState.sharedBuffer.Length];
-                Array.Copy(synthState.sharedBuffer, bufferCopy, synthState.sharedBuffer.Length);
-            }
-            else {
-                bufferCopy = new float[0];
-            }
-        }
-        WaveformVisualizer.instance.UpdateWaveform(bufferCopy);
-    }
-    private void LateUpdate()
-    {
-        //sla de settings op in een ander script waar iedereen bij kan.
-        // GlobalSynthSettings.instance.UpdateSettings(synthState.DSPIsActive, synthState.CurrentWaveForm, synthState.mChannels, synthState.sineFrequency, synthState.sampleRate);
-    }
-
     void OnDestroy()
     {
         //release je dsp en group

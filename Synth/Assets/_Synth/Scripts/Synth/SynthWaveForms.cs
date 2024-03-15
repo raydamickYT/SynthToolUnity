@@ -22,8 +22,6 @@ public class SynthInfo
     public float CarrierPhase;
     public float[] mDataBuffer;
     public WaveForm CurrentWaveForm { get; internal set; }
-    private FMOD.ChannelGroup masterCG;
-    CreateSynth createSynth;
     [Range(0f, 1f)]
     public float volume = 0.5f; // Standaard volume op 50%
     public float savedSampleValue;
@@ -49,13 +47,6 @@ public class SynthInfo
         Frequency = 0;
         SamplingFrequency = 0;
         CurrentWaveForm = WaveForm.Sine; //sine is gwn de default
-    }
-
-    public SynthInfo(float frequency, uint samplingFrequency, WaveForm _current)
-    {
-        Frequency = frequency;
-        SamplingFrequency = samplingFrequency;
-        CurrentWaveForm = _current;
     }
 }
 
