@@ -20,7 +20,7 @@ public class DSPCallback
         functions.getuserdata(ref dsp_state, out userData);
 
         GCHandle objHandle = GCHandle.FromIntPtr(userData);
-        Synth obj = objHandle.Target as Synth;
+        SynthState obj = objHandle.Target as SynthState;
 
         // Save the channel count out for the update function
         obj.mChannels = inchannels;

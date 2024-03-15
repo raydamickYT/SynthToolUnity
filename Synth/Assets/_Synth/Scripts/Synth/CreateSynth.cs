@@ -1,14 +1,16 @@
 using UnityEngine;
 using System.Runtime.InteropServices;
+using FMODUnity;
 
 public class CreateSynth
 {
-    private Synth synth;
+    private SynthState synth;
 
-    public CreateSynth(Synth _synth)
+    public CreateSynth(SynthState _synth)
     {
         synth = _synth;
     }
+
     public void CreateDSP()
     {
         // Assign the callback to a member variable to avoid garbage collection
@@ -24,7 +26,7 @@ public class CreateSynth
         // Get a handle to this object to pass into the callback
         // SynthState synthState = new(sineFrequency, (uint)sampleRate, mDataBuffer);
 
-        synth.mObjHandle = GCHandle.Alloc(this);
+        synth.mObjHandle = GCHandle.Alloc(synth);
         if (synth.mObjHandle != null)
         {
             // Define a basic DSP that receives a callback each mix to capture audio

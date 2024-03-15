@@ -10,8 +10,8 @@ public class AudioDataProcessor : MonoBehaviour
     void Start()
     {
         // Initialisatie van je audioDataBuffer, misschien ergens in je DSP callback
-        audioDataBuffer = voorbeeldScript.sharedBuffer;
-        bufferSize = (int)voorbeeldScript.mBufferLength;
+        audioDataBuffer = SynthState.instance.sharedBuffer;
+        bufferSize = (int)SynthState.instance.mBufferLength;
     }
 
     // Een voorbeeld methode die aangeroepen kan worden om de gemiddelde amplitude te berekenen

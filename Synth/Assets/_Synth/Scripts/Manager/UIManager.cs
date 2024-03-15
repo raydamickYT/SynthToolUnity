@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour
 {
     public static int RecordIndex = 0;
     [SerializeField] private Synth voorbeeldScript;
+    private SynthState synthState;
     [SerializeField] private AudioRecorder audioRecorder;
 
     public Button OnOffBtn;
@@ -20,16 +21,17 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
+        synthState = SynthState.instance;
         Initialization();
     }
     private void Initialization()
     {
-        voorbeeldScript.mCaptureDSP.getActive(out SynthIsPlaying);
+        synthState.mCaptureDSP.getActive(out SynthIsPlaying);
 
-        FrequencySlider.value = voorbeeldScript.sineFrequency;
+        FrequencySlider.value = synthState.sineFrequency;
         FrequencySlider.onValueChanged.AddListener(ChangeFreq);
 
-        VolumeSlider.value = voorbeeldScript.volume;
+        VolumeSlider.value = synthState.volume;
         VolumeSlider.onValueChanged.AddListener(ChageVol);
 
         ChangeWave.onValueChanged.AddListener(delegate
@@ -97,16 +99,16 @@ public class UIManager : MonoBehaviour
         switch (change.value)
         {
             case 0: //sine wave
-                voorbeeldScript.CurrentWaveForm = WaveForm.Sine;
+                synthState.CurrentWaveForm = WaveForm.Sine;
                 break;
             case 1: // sawtooth
-                voorbeeldScript.CurrentWaveForm = WaveForm.Sawtooth;
+                synthState.CurrentWaveForm = WaveForm.Sawtooth;
                 break;
             case 2: //square
-                voorbeeldScript.CurrentWaveForm = WaveForm.Square;
+                synthState.CurrentWaveForm = WaveForm.Square;
                 break;
             case 3: //triangle
-                voorbeeldScript.CurrentWaveForm = WaveForm.Triangle;
+                synthState.CurrentWaveForm = WaveForm.Triangle;
                 break;
             default:
                 break;
@@ -117,7 +119,7 @@ public class UIManager : MonoBehaviour
     {
         Debug.Log("synth staat aan");
         // Synth.instance.CreateCustomDSP();
-        voorbeeldScript.mCaptureDSP.setActive(true); // zet de dsp op actief.
+        synthState.mCaptureDSP.setActive(true); // zet de dsp op actief.
 
     }
 
@@ -125,17 +127,17 @@ public class UIManager : MonoBehaviour
     {
         Debug.Log("synth staat uit");
         // Synth.instance.GlobalDSP.release();
-        voorbeeldScript.mCaptureDSP.setActive(false); // zet de dsp op inactief. 
+        synthState.mCaptureDSP.setActive(false); // zet de dsp op inactief. 
     }
 
     private void ChangeFreq(float vol)
     {
-        voorbeeldScript.sineFrequency = vol;
+        synthState.sineFrequency = vol;
     }
 
     private void ChageVol(float vol)
     {
-        voorbeeldScript.volume = vol;
+        synthState.volume = vol;
     }
 
     public void StartRecording()

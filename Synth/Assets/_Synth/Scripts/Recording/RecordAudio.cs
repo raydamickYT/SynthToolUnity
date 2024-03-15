@@ -124,13 +124,13 @@ public class AudioRecorder : MonoBehaviour
 
         using (FileStream fileStream = new FileStream(path, FileMode.Create))
         {
-            WriteWavHeader(fileStream, audioData.Length, voorbeeldScript.sampleRate, numChannels, BitDepth); // Schrijf een WAV-header naar het bestand.
+            WriteWavHeader(fileStream, audioData.Length, SynthState.instance.sampleRate, numChannels, BitDepth); // Schrijf een WAV-header naar het bestand.
             fileStream.Write(audioData, 0, audioData.Length); // Schrijf de audio data.
         }
 
         UnityEngine.Debug.Log($"Recording saved to: {path}");
 
-        UnityEngine.Debug.Log(voorbeeldScript.mChannels);
+        UnityEngine.Debug.Log(SynthState.instance.mChannels);
         // De rest van je SaveRecording logica hier...
     }
 
