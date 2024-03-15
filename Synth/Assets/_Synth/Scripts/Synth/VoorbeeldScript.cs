@@ -15,13 +15,13 @@ class VoorbeeldScript : MonoBehaviour
     public bool DSPIsActive = false;
     private FMOD.DSP_READ_CALLBACK mReadCallback;
     public FMOD.DSP mCaptureDSP;
-    private float[] mDataBuffer, sharedBuffer;
+    public float[] mDataBuffer, sharedBuffer;
     private readonly object bufferLock = new object();
 
     private GCHandle mObjHandle;
     public WaveForm CurrentWaveForm = WaveForm.Sawtooth; // Standaard golfvorm
-    private uint mBufferLength;
-    private int mChannels = 0;
+    public uint mBufferLength;
+    public int mChannels = 0;
     public float sineFrequency = 440f; // Frequentie van de sinusgolf in Hz
     private float phase = 0f; // Fase van de sinusgolf
     public int sampleRate = 48000; // Stel dit in op de daadwerkelijke sample rate van je systeem
@@ -147,13 +147,19 @@ class VoorbeeldScript : MonoBehaviour
             FMOD.ChannelGroup masterCG;
             if (FMODUnity.RuntimeManager.CoreSystem.getMasterChannelGroup(out masterCG) == FMOD.RESULT.OK)
             {
+
                 if (FMODUnity.RuntimeManager.CoreSystem.createDSP(ref desc, out mCaptureDSP) == FMOD.RESULT.OK) //hier wordt de dsp aangemaakt
                 {
                     mCaptureDSP.setActive(false); //zet hem tijdelijk op inactief, dan kunnen we dat later aanpassen.
                     mCaptureDSP.getActive(out DSPIsActive); //sla het gelijk op zodat we het in andere scripts kunnen gebruiken.
-                    if (masterCG.addDSP(0, mCaptureDSP) != FMOD.RESULT.OK) //hier voegen we hem toe aan de mastergroup (hierdoor kunnen we hem horen.)
+                    if (masterCG.addDSP(FMOD.CHANNELCONTROL_DSP_INDEX.HEAD, mCaptureDSP) != FMOD.RESULT.OK) //hier voegen we hem toe aan de mastergroup (hierdoor kunnen we hem horen.)
                     {
                         Debug.LogWarningFormat("FMOD: Unable to add mCaptureDSP to the master channel group");
+                    }
+                    else
+                    {
+                        masterCG.getNumChannels(out int channels);
+                        Debug.Log(channels);
                     }
                 }
                 else
@@ -179,7 +185,6 @@ class VoorbeeldScript : MonoBehaviour
 
     void Update()
     {
-        Debug.Log(sharedBuffer);
         float[] bufferCopy;
         lock (bufferLock)
         {

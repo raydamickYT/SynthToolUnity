@@ -89,7 +89,7 @@ public class UIManager : MonoBehaviour
 
     private void ChangeFreq(float vol)
     {
-        Debug.Log(vol);
+        // Debug.Log(vol);
         // Synth.instance.myDsp.setParameterFloat(FMODUnity.FMOD.DSP_INDEX.HEAD, vol); // hier is 0 aangegeven omdat (meestal) de default voor de volume parameter 0 is. 
         voorbeeldScript.sineFrequency = vol;
     }

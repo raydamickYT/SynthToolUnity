@@ -4,7 +4,8 @@ using FMOD;
 using FMODUnity;
 using SFB;
 using System.IO;
-using System.Runtime.InteropServices; // standalone file browser
+using System.Runtime.InteropServices;
+using FMODUnityResonance; // standalone file browser
 
 public class AudioRecorder : MonoBehaviour
 {
@@ -14,23 +15,34 @@ public class AudioRecorder : MonoBehaviour
     private FMOD.Sound sound; // Sound object to hold the recording
     private bool isRecording = false; // Flag to check if currently recording
     private int numChannels = 2; // Aantal kanalen (stereo)
+    private int BitDepth = 16; //16, 24 of 32
 
     void Start()
     {
         // Initialize the FMOD system
         system = RuntimeManager.CoreSystem;
     }
+        // Start is called before the first frame update
+
 
     // Start the recording
     public void StartRecording()
     {
+        int nativeChannels, nativeRate;
+        // FMODUnity.RuntimeManager.CoreSystem.getRecordDriverInfo(9, out string name, 0, out _, out nativeRate, out _, out nativeChannels, out _);
+        FMODUnity.RuntimeManager.CoreSystem.getNumDrivers(out int test);
+                for (int i = 0; i < test; i++)
+        {
+            system.getRecordDriverInfo(i, out string name, 256, out _, out int sampleRate, out FMOD.SPEAKERMODE speakerMode, out int channels, out _);
+           UnityEngine.Debug.Log($"Apparaat {i}: {name}, SampleRate: {sampleRate}, SpeakerMode: {speakerMode}, Channels: {channels}");
+        }
+        UnityEngine.Debug.Log(name);
         if (isRecording) return; // Check if already recording
-
         FMOD.CREATESOUNDEXINFO soundExInfo = new FMOD.CREATESOUNDEXINFO
         {
             cbsize = Marshal.SizeOf(typeof(FMOD.CREATESOUNDEXINFO)),
-            numchannels = numChannels, // Stereo
-            defaultfrequency = sampleRate, // 44100 Hz
+            numchannels = 2, // Stereo
+            defaultfrequency = 48000, // 44100 Hz
             format = FMOD.SOUND_FORMAT.PCM16, // 16-bit PCM audio
             length = (uint)(10 * sampleRate * numChannels * sizeof(short)) // Voor 10 seconden opname
         };
@@ -42,7 +54,7 @@ public class AudioRecorder : MonoBehaviour
             return;
         }
 
-        system.recordStart(0, sound, true);
+        system.recordStart(8, sound, true);
         isRecording = true;
         UnityEngine.Debug.Log("Recording started...");
     }
@@ -72,6 +84,10 @@ public class AudioRecorder : MonoBehaviour
 
         // Eerst ophalen van de geluidslengte
         result = sound.getLength(out length, FMOD.TIMEUNIT.PCMBYTES);
+        UnityEngine.Debug.Log(length);
+        {
+
+        }
         if (result != FMOD.RESULT.OK)
         {
             UnityEngine.Debug.LogError("Failed to get sound length: " + result.ToString());
@@ -97,27 +113,44 @@ public class AudioRecorder : MonoBehaviour
             UnityEngine.Debug.LogError("Failed to unlock sound: " + result.ToString());
         }
 
+        using (FileStream fileStream = new FileStream(path, FileMode.Create))
+        {
+            WriteWavHeader(fileStream, audioData.Length, voorbeeldScript.sampleRate, numChannels, BitDepth); // Schrijf een WAV-header naar het bestand.
+            fileStream.Write(audioData, 0, audioData.Length); // Schrijf de audio data.
+        }
+
+        UnityEngine.Debug.Log($"Recording saved to: {path}");
+
+        UnityEngine.Debug.Log(voorbeeldScript.mChannels);
         // De rest van je SaveRecording logica hier...
     }
 
     // Methode om een eenvoudige WAV-header te schrijven. Dit is vereenvoudigd en gaat ervan uit dat de audio 16-bit PCM is.
-    private void WriteWavHeader(FileStream stream, int dataLength)
+    private void WriteWavHeader(FileStream stream, int dataLength, int sampleRate, int numChannels, int bitsPerSample)
     {
+        int blockAlign = numChannels * (bitsPerSample / 8);
+        int byteRate = sampleRate * blockAlign;
+
         byte[] header = new byte[44];
+
         // RIFF header
         WriteBytes(header, 0, "RIFF");
-        WriteInt32(header, 4, dataLength + 36); // Bestandsgrootte minus de eerste 8 bytes van de RIFF beschrijving
+        WriteInt32(header, 4, 36 + dataLength); // Bestandsgrootte minus de eerste 8 bytes van de RIFF beschrijving
         WriteBytes(header, 8, "WAVE");
+
+        // fmt subchunk
         WriteBytes(header, 12, "fmt ");
-        WriteInt32(header, 16, 16); // Lengte van het formaat data
-        WriteInt16(header, 20, 1); // Type formaat (1 is PCM)
-        WriteInt16(header, 22, 2); // Aantal kanalen
-        WriteInt32(header, 24, voorbeeldScript.sampleRate); // Samplefrequentie
-        WriteInt32(header, 28, voorbeeldScript.sampleRate * 4); // Byte rate (Sample Rate * Block Align)
-        WriteInt16(header, 32, 4); // Block align (Number of Channels * BitsPerSample / 8)
-        WriteInt16(header, 34, 16); // Bits per sample
+        WriteInt32(header, 16, 16); // Lengte van 'fmt' subchunk (16 voor PCM)
+        WriteInt16(header, 20, 1); // Audioformat (1 = PCM)
+        WriteInt16(header, 22, (short)numChannels);
+        WriteInt32(header, 24, sampleRate);
+        WriteInt32(header, 28, byteRate); // Byte rate
+        WriteInt16(header, 32, (short)blockAlign); // Block align
+        WriteInt16(header, 34, (short)bitsPerSample);
+
+        // data subchunk
         WriteBytes(header, 36, "data");
-        WriteInt32(header, 40, dataLength); // Subchunk2Size (NumSamples * NumChannels * BitsPerSample/8)
+        WriteInt32(header, 40, dataLength); // Subchunk2Size = NumSamples * NumChannels * BitsPerSample/8
 
         stream.Write(header, 0, header.Length);
     }

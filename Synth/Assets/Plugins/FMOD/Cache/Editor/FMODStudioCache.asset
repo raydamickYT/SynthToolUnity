@@ -15,10 +15,10 @@ MonoBehaviour:
   Path: ../FMOD/Synth/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 638459292757921726
+  lastModified: 638461032052729126
   FileSizes:
   - Name: Desktop
-    Value: 754
+    Value: 862
   Exists: 1
 --- !u!114 &-3974749391512939361
 MonoBehaviour:
@@ -64,12 +64,13 @@ MonoBehaviour:
   - {fileID: 3060937276672977679}
   EditorEvents:
   - {fileID: -3974749391512939361}
+  - {fileID: 7544365535393652738}
   EditorParameters: []
   MasterBanks:
   - {fileID: 3060937276672977679}
   StringsBanks:
   - {fileID: -7904404770403339753}
-  cacheTime: 638459292757921726
+  cacheTime: 638461032052729126
   cacheVersion: 131609
 --- !u!114 &3060937276672977679
 MonoBehaviour:
@@ -86,8 +87,35 @@ MonoBehaviour:
   Path: ../FMOD/Synth/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 638459292757921726
+  lastModified: 638461032052719187
   FileSizes:
   - Name: Desktop
-    Value: 1574
+    Value: 114432
   Exists: 1
+--- !u!114 &7544365535393652738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Aircraft, Helicopter, Chopper Standing Still, Close, Loop SND78037
+  m_EditorClassIdentifier: 
+  Path: event:/Aircraft, Helicopter, Chopper Standing Still, Close, Loop SND78037
+  Guid:
+    Data1: -1063415348
+    Data2: 1193388974
+    Data3: 915704221
+    Data4: -863136060
+  Banks:
+  - {fileID: 3060937276672977679}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 8068
