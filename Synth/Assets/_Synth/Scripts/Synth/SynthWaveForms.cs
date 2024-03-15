@@ -14,9 +14,9 @@ public enum WaveForm
     Triangle
 }
 
-public class SynthState
+public class SynthInfo
 {
-    public static SynthState instance;
+    public static SynthInfo instance;
     public float Frequency;
     public uint SamplingFrequency;
     public float CarrierPhase;
@@ -39,22 +39,28 @@ public class SynthState
     public float phase = 0f; // Fase van de sinusgolf
     public int sampleRate = 48000; // Stel dit in op de daadwerkelijke sample rate van je systeem
 
-    public SynthState()
+    public SynthWaves synthWaves = new();
+    public SynthInfo()
     {
-        if(instance == null){
+        if (instance == null)
+        {
             instance = this;
         }
         Frequency = 0;
         SamplingFrequency = 0;
         CurrentWaveForm = WaveForm.Sine; //sine is gwn de default
     }
-    public SynthState(float frequency, uint samplingFrequency, WaveForm _current)
+
+    public SynthInfo(float frequency, uint samplingFrequency, WaveForm _current)
     {
         Frequency = frequency;
         SamplingFrequency = samplingFrequency;
         CurrentWaveForm = _current;
     }
+}
 
+public class SynthWaves
+{
     public float GenerateSineWave(float frequency, uint sampleRate, ref float phase, uint index)
     {
         float sample = Mathf.Sin(phase);
@@ -62,7 +68,7 @@ public class SynthState
         phase += phaseIncrement;
         if (phase >= 2f * Mathf.PI) phase -= 2f * Mathf.PI;
 
-        return sample * volume;
+        return sample * SynthInfo.instance.volume;
     }
 
     public float GenerateSawtoothWave(float frequency, uint sampleRate, ref float phase, uint index)
@@ -81,7 +87,7 @@ public class SynthState
         // De fase loopt lineair op, dus we mappen deze direct naar onze output
         float sawtooth = (phase / (2f * Mathf.PI)) * 2f - 1f;
 
-        return sawtooth * volume;
+        return sawtooth * SynthInfo.instance.volume;
     }
 
 
@@ -104,7 +110,7 @@ public class SynthState
         float position = (index + phase / phaseIncrement) % period;
 
         // De golf wisselt tussen 1 en -1 halverwege elke periode
-        return (position < period / 2 ? 1f : -1f) * volume;
+        return (position < period / 2 ? 1f : -1f) * SynthInfo.instance.volume;
     }
     public float GenerateTriangleWave(uint index, uint sampleRate, float frequency, ref float phase)
     {
@@ -120,12 +126,11 @@ public class SynthState
 
         // Formule voor de driehoeksgolf aangepast om fase te incorporeren
         if (position < 0.25f)
-            return (4f * position) * volume; // Oplopend van 0 naar 1
+            return (4f * position) * SynthInfo.instance.volume; // Oplopend van 0 naar 1
         else if (position < 0.75f)
-            return (2f - 4f * position) * volume; // Aflopend van 1 naar -1
+            return (2f - 4f * position) * SynthInfo.instance.volume; // Aflopend van 1 naar -1
         else
-            return (-4f + 4f * position) * volume; // Oplopend van -1 naar 0
+            return (-4f + 4f * position) * SynthInfo.instance.volume; // Oplopend van -1 naar 0
     }
-
 }
 

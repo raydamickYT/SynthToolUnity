@@ -7,7 +7,7 @@ public class Synth : MonoBehaviour
 {
     private FMOD.ChannelGroup masterCG;
     CreateSynth createSynth;
-    SynthState synthState;
+    SynthInfo synthState;
 
 
     private void Awake()
@@ -40,18 +40,21 @@ public class Synth : MonoBehaviour
         float[] bufferCopy;
         lock (synthState.bufferLock)
         {
-            bufferCopy = new float[synthState.sharedBuffer.Length];
-            Array.Copy(synthState.sharedBuffer, bufferCopy, synthState.sharedBuffer.Length);
+            if (synthState.sharedBuffer != null)
+            {
+                bufferCopy = new float[synthState.sharedBuffer.Length];
+                Array.Copy(synthState.sharedBuffer, bufferCopy, synthState.sharedBuffer.Length);
+            }
+            else {
+                bufferCopy = new float[0];
+            }
         }
-        if (synthState.sharedBuffer != null)
-        {
-            WaveformVisualizer.instance.UpdateWaveform(bufferCopy);
-        }
+        WaveformVisualizer.instance.UpdateWaveform(bufferCopy);
     }
     private void LateUpdate()
     {
         //sla de settings op in een ander script waar iedereen bij kan.
-        GlobalSynthSettings.instance.UpdateSettings(synthState.DSPIsActive, synthState.CurrentWaveForm, synthState.mChannels, synthState.sineFrequency, synthState.sampleRate);
+        // GlobalSynthSettings.instance.UpdateSettings(synthState.DSPIsActive, synthState.CurrentWaveForm, synthState.mChannels, synthState.sineFrequency, synthState.sampleRate);
     }
 
     void OnDestroy()

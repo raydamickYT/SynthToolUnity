@@ -11,7 +11,7 @@ public class UIManager : MonoBehaviour
 {
     public static int RecordIndex = 0;
     [SerializeField] private Synth voorbeeldScript;
-    private SynthState synthState;
+    private SynthInfo synthState;
     [SerializeField] private AudioRecorder audioRecorder;
 
     public Button OnOffBtn;
@@ -21,7 +21,7 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        synthState = SynthState.instance;
+        synthState = SynthInfo.instance;
         Initialization();
     }
     private void Initialization()

@@ -12,6 +12,6 @@ public class UpdateFrequencyNumber : MonoBehaviour
     }
 
     private void LateUpdate() {
-        text.text = GlobalSynthSettings.instance.Frequency.ToString();
+        text.text = SynthInfo.instance.Frequency.ToString();
     }
 }

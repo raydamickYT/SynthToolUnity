@@ -6,15 +6,15 @@ using UnityEngine.UI;
 
 public class SaveSettings : MonoBehaviour
 {
-    private GlobalSynthSettings globalSynthSettings;
+    private SynthInfo globalSynthSettings;
     private SettingsSaver settingsSaver = new();
-    private SettingsLoader settingsLoader = new();
+    public SettingsLoader settingsLoader;
     private Dropdown dropdown;
     private Button button;
     // Start is called before the first frame update
     void Start()
     {
-        globalSynthSettings = GlobalSynthSettings.instance;
+        globalSynthSettings = SynthInfo.instance;
 
         dropdown = GetComponentInChildren<Dropdown>();
         dropdown.gameObject.SetActive(false);
@@ -48,13 +48,13 @@ public class SaveSettings : MonoBehaviour
 
     public void SaveSynthSettings()
     {
-        SynthState synthState = new SynthState(globalSynthSettings.Frequency, (uint)globalSynthSettings.SampleRate, globalSynthSettings.CurrentWaveForm);
+        SynthInfo synthState = SynthInfo.instance;
         settingsSaver.SaveSettingsWithFileDialog(synthState);
     }
 
     public void LoadSettings()
     {
-        SynthState synthState = new SynthState();
+        SynthInfo synthState = SynthInfo.instance;
 
         // Vraag de gebruiker om een bestandspad te kiezen
         string filePath = EditorUtility.OpenFilePanel("Load Settings", "", "txt");

@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class SettingsLoader
+public class SettingsLoader : MonoBehaviour
 {
     [SerializeField] private UIManager uIManager;
     // Methode om instellingen te laden vanuit een bestand
-    public void LoadSettings(string filePath, SynthState _state)
+    public void LoadSettings(string filePath, SynthInfo _state)
     {
         try
         {
@@ -56,10 +56,10 @@ public class SettingsLoader
     }
 
 
-    void ApplySettings(SynthState _state)
+    void ApplySettings(SynthInfo _state)
     {
-
         //uimanager updaten
+        Debug.Log(uIManager);
         uIManager.ChangeWave.value = (int)_state.CurrentWaveForm;
         uIManager.FrequencySlider.value = _state.Frequency;
     }

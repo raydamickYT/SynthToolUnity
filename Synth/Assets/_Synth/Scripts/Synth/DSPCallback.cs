@@ -20,7 +20,7 @@ public class DSPCallback
         functions.getuserdata(ref dsp_state, out userData);
 
         GCHandle objHandle = GCHandle.FromIntPtr(userData);
-        SynthState obj = objHandle.Target as SynthState;
+        SynthInfo obj = objHandle.Target as SynthInfo;
 
         // Save the channel count out for the update function
         obj.mChannels = inchannels;
@@ -37,20 +37,20 @@ public class DSPCallback
             switch (obj.CurrentWaveForm) // Gebruik de huidige golfvorm
             {
                 case WaveForm.Sine:
-                    sampleValue = obj.GenerateSineWave(obj.sineFrequency, (uint)obj.sampleRate, ref obj.phase, sampleIndex);
+                    sampleValue = obj.synthWaves.GenerateSineWave(obj.sineFrequency, (uint)obj.sampleRate, ref obj.phase, sampleIndex);
                     break;
                 case WaveForm.Sawtooth:
-                    sampleValue = obj.GenerateSawtoothWave(obj.sineFrequency, (uint)obj.sampleRate, ref obj.phase, sampleIndex);
+                    sampleValue = obj.synthWaves.GenerateSawtoothWave(obj.sineFrequency, (uint)obj.sampleRate, ref obj.phase, sampleIndex);
                     // Bereken de zaagtandgolf sample
                     break;
                 case WaveForm.Square:
                     // Bereken de vierkantgolf sample
-                    sampleValue = obj.GenerateSquareWave(sampleIndex, (uint)obj.sampleRate, obj.sineFrequency, ref obj.phase);
+                    sampleValue = obj.synthWaves.GenerateSquareWave(sampleIndex, (uint)obj.sampleRate, obj.sineFrequency, ref obj.phase);
 
                     break;
                 case WaveForm.Triangle:
                     // Bereken de driehoeksgolf sample
-                    sampleValue = obj.GenerateTriangleWave(sampleIndex, (uint)obj.sampleRate, obj.sineFrequency, ref obj.phase);
+                    sampleValue = obj.synthWaves.GenerateTriangleWave(sampleIndex, (uint)obj.sampleRate, obj.sineFrequency, ref obj.phase);
                     break;
             }
             for (int channel = 0; channel < outchannels; channel++)

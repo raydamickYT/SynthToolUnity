@@ -28,7 +28,7 @@ public class SettingsSaver
     }
 
     // Voorbeeldgebruik: Roep deze methode aan wanneer je de instellingen wilt opslaan
-    private string[] GetAllSettings(SynthState _state)
+    private string[] GetAllSettings(SynthInfo _state)
     {
         // Definieer de bestandsnaam voor het opslaan van de instellingen
         // string fileName = "settings.txt";
@@ -48,7 +48,7 @@ public class SettingsSaver
         return settings;
     }
 
-    public void SaveSettingsWithFileDialog(SynthState _state)
+    public void SaveSettingsWithFileDialog(SynthInfo _state)
     {
         // Vraag de gebruiker om een bestandspad te kiezen
         string filePath = EditorUtility.SaveFilePanel("Save Settings", "", "settings.txt", "txt");

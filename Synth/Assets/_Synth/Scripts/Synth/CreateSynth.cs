@@ -4,9 +4,9 @@ using FMODUnity;
 
 public class CreateSynth
 {
-    private SynthState synth;
+    private SynthInfo synth;
 
-    public CreateSynth(SynthState _synth)
+    public CreateSynth(SynthInfo _synth)
     {
         synth = _synth;
     }
