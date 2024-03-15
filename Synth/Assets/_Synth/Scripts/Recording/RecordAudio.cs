@@ -5,7 +5,8 @@ using FMODUnity;
 using SFB;
 using System.IO;
 using System.Runtime.InteropServices;
-using FMODUnityResonance; // standalone file browser
+using FMODUnityResonance;
+using System.Collections.Generic; // standalone file browser
 
 public class AudioRecorder : MonoBehaviour
 {
@@ -16,27 +17,35 @@ public class AudioRecorder : MonoBehaviour
     private bool isRecording = false; // Flag to check if currently recording
     private int numChannels = 2; // Aantal kanalen (stereo)
     private int BitDepth = 16; //16, 24 of 32
+    private int AudioDeviceIndex;
 
     void Start()
     {
         // Initialize the FMOD system
         system = RuntimeManager.CoreSystem;
+        StoreActiveAudioOutputIndex();
+
     }
-        // Start is called before the first frame update
+    // Start is called before the first frame update
+    void StoreActiveAudioOutputIndex()
+    {
+        FMOD.RESULT result;
+        int driverIndex =5;
+        result = system.getDriver(out driverIndex);
+        if (result != FMOD.RESULT.OK)
+        {
+            UnityEngine.Debug.LogError("FMOD getDriver failed: " + result);
+            return;
+        }
+
+        UnityEngine.Debug.Log($"Actieve audio output index: {driverIndex}");
+        // Je kunt hier de opgeslagen driverIndex gebruiken zoals nodig voor je applicatie
+    }
 
 
     // Start the recording
     public void StartRecording()
     {
-        int nativeChannels, nativeRate;
-        // FMODUnity.RuntimeManager.CoreSystem.getRecordDriverInfo(9, out string name, 0, out _, out nativeRate, out _, out nativeChannels, out _);
-        FMODUnity.RuntimeManager.CoreSystem.getNumDrivers(out int test);
-                for (int i = 0; i < test; i++)
-        {
-            system.getRecordDriverInfo(i, out string name, 256, out _, out int sampleRate, out FMOD.SPEAKERMODE speakerMode, out int channels, out _);
-           UnityEngine.Debug.Log($"Apparaat {i}: {name}, SampleRate: {sampleRate}, SpeakerMode: {speakerMode}, Channels: {channels}");
-        }
-        UnityEngine.Debug.Log(name);
         if (isRecording) return; // Check if already recording
         FMOD.CREATESOUNDEXINFO soundExInfo = new FMOD.CREATESOUNDEXINFO
         {
@@ -54,7 +63,7 @@ public class AudioRecorder : MonoBehaviour
             return;
         }
 
-        system.recordStart(8, sound, true);
+        system.recordStart(UIManager.RecordIndex, sound, true);
         isRecording = true;
         UnityEngine.Debug.Log("Recording started...");
     }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using FMODUnity;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
@@ -6,13 +8,14 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    public static int RecordIndex = 0;
     [SerializeField] private VoorbeeldScript voorbeeldScript;
     [SerializeField] private SettingsSaver settingsSaver;
     [SerializeField] private SettingsLoader settingsLoader;
     [SerializeField] private AudioRecorder audioRecorder;
 
     public Button OnOffBtn;
-    public Dropdown ChangeWave;
+    public Dropdown ChangeWave, dropdown;
     public Slider VolumeSlider;
     private bool SynthIsPlaying = true;
 
@@ -32,8 +35,45 @@ public class UIManager : MonoBehaviour
             WaveChanged(ChangeWave);
         });
 
+        PopulateDropdownWithRecordDevices();
+
         OnOffBtn.onClick.AddListener(ToggleSynth);
+        FMODUnity.RuntimeManager.CoreSystem.getNumDrivers(out int test);
+        for (int i = 0; i < test; i++)
+        {
+            RuntimeManager.CoreSystem.getRecordDriverInfo(i, out string name, 256, out _, out int sampleRate, out FMOD.SPEAKERMODE speakerMode, out int channels, out _);
+            UnityEngine.Debug.Log($"Apparaat {i}: {name}, SampleRate: {sampleRate}, SpeakerMode: {speakerMode}, Channels: {channels}");
+        }
+        UnityEngine.Debug.Log(name);
+
     }
+
+
+    void PopulateDropdownWithRecordDevices()
+    {
+        FMOD.System system = RuntimeManager.CoreSystem;
+        system.getNumDrivers(out int numRecordDevices);
+
+        dropdown.ClearOptions();
+        for (int i = 0; i < numRecordDevices; i++)
+        {
+            system.getRecordDriverInfo(i, out string name, 256, out _, out int sampleRate, out FMOD.SPEAKERMODE speakerMode, out int channels, out _);
+            string deviceInfo = $"Apparaat {i}: {name}, SampleRate: {sampleRate}, SpeakerMode: {speakerMode}, Channels: {channels}";
+            dropdown.options.Add(new Dropdown.OptionData(deviceInfo));
+        }
+
+        dropdown.RefreshShownValue();
+
+        dropdown.onValueChanged.AddListener(SetSelectedRecordDevice);
+    }
+
+    public void SetSelectedRecordDevice(int selectedIndex)
+    {
+        // FMODUnity.RuntimeManager.CoreSystem.setRecordDriver(selectedIndex);
+        RecordIndex = selectedIndex;
+        Debug.Log($"Geselecteerd opnameapparaat: {dropdown.options[selectedIndex].text}");
+    }
+
     public void ToggleSynth()
     {
         switch (SynthIsPlaying)
