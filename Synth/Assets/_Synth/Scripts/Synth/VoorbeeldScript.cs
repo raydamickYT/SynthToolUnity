@@ -193,41 +193,13 @@ class VoorbeeldScript : MonoBehaviour
         }
         WaveformVisualizer.instance.UpdateWaveform(bufferCopy);
 
-        // Do what you want with the captured data
-        for (int j = 0; j < mBufferLength; j++)
-        {
-            for (int i = 0; i < mChannels; i++)
-            {
-                float x = j * WIDTH;
-                float y = mDataBuffer[(j * mChannels) + i] * HEIGHT;
 
-                // Make sure Gizmos is enabled in the Unity Editor to show debug line draw for the captured channel data
-                Debug.DrawLine(new Vector3(x, (YOFFSET * i) + y, 0), new Vector3(x, (YOFFSET * i) - y, 0), Color.green);
-            }
-        }
     }
-
-
-    // //wordt gebruikt door ui
-    // private void WaveChanged(Dropdown change)
-    // {
-    //     Debug.Log("dropdown changed to value: " + change.value);
-    //     switch (change.value)
-    //     {
-    //         case 0: //sine wave
-    //             Synth.currentWaveForm = WaveForm.Sine;
-    //             break;
-    //         case 1: // sawtooth
-    //             Synth.currentWaveForm = WaveForm.Sawtooth;
-    //             break;
-    //         case 2: //square
-    //             Synth.currentWaveForm = WaveForm.Square;
-    //             break;
-    //         default:
-    //             break;
-    //     }
-
-    // }
+    private void LateUpdate()
+    {
+        //sla de settings op in een ander script waar iedereen bij kan.
+        GlobalSynthSettings.instance.UpdateSettings(DSPIsActive, CurrentWaveForm, mChannels, sineFrequency, sampleRate);
+    }   
 
     public float GenerateSineWave(float frequency, uint sampleRate, ref float phase, uint index)
     {

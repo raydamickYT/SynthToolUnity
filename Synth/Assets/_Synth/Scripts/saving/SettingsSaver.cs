@@ -6,7 +6,7 @@ using System.IO;
 using Unity.VisualScripting;
 using UnityEditor;
 
-public class SettingsSaver : MonoBehaviour
+public class SettingsSaver 
 {
 
     // Methode om de instellingen op te slaan

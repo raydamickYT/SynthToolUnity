@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class SettingsLoader : MonoBehaviour
+public class SettingsLoader
 {
     [SerializeField] private UIManager uIManager;
     // Methode om instellingen te laden vanuit een bestand

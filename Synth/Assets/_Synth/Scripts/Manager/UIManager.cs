@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using FMODUnity;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.iOS;
 using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
 
@@ -10,8 +11,6 @@ public class UIManager : MonoBehaviour
 {
     public static int RecordIndex = 0;
     [SerializeField] private VoorbeeldScript voorbeeldScript;
-    [SerializeField] private SettingsSaver settingsSaver;
-    [SerializeField] private SettingsLoader settingsLoader;
     [SerializeField] private AudioRecorder audioRecorder;
 
     public Button OnOffBtn;
@@ -58,7 +57,7 @@ public class UIManager : MonoBehaviour
         for (int i = 0; i < numRecordDevices; i++)
         {
             system.getRecordDriverInfo(i, out string name, 256, out _, out int sampleRate, out FMOD.SPEAKERMODE speakerMode, out int channels, out _);
-            string deviceInfo = $"Apparaat {i}: {name}, SampleRate: {sampleRate}, SpeakerMode: {speakerMode}, Channels: {channels}";
+            string deviceInfo = $"Apparaat {i}: {name}";
             dropdown.options.Add(new Dropdown.OptionData(deviceInfo));
         }
 
@@ -73,7 +72,6 @@ public class UIManager : MonoBehaviour
         RecordIndex = selectedIndex;
         Debug.Log($"Geselecteerd opnameapparaat: {dropdown.options[selectedIndex].text}");
     }
-
     public void ToggleSynth()
     {
         switch (SynthIsPlaying)
@@ -133,26 +131,26 @@ public class UIManager : MonoBehaviour
         // Synth.instance.myDsp.setParameterFloat(FMODUnity.FMOD.DSP_INDEX.HEAD, vol); // hier is 0 aangegeven omdat (meestal) de default voor de volume parameter 0 is. 
         voorbeeldScript.sineFrequency = vol;
     }
-    public void SaveSettings()
-    {
-        SynthState synthState = new SynthState(voorbeeldScript.sineFrequency, (uint)voorbeeldScript.sampleRate, voorbeeldScript.CurrentWaveForm);
-        settingsSaver.SaveSettingsWithFileDialog(synthState);
-    }
+    // public void SaveSettings()
+    // {
+    //     SynthState synthState = new SynthState(voorbeeldScript.sineFrequency, (uint)voorbeeldScript.sampleRate, voorbeeldScript.CurrentWaveForm);
+    //     settingsSaver.SaveSettingsWithFileDialog(synthState);
+    // }
 
-    public void LoadSettings()
-    {
-        SynthState synthState = new SynthState();
+    // public void LoadSettings()
+    // {
+    //     SynthState synthState = new SynthState();
 
-        // Vraag de gebruiker om een bestandspad te kiezen
-        string filePath = EditorUtility.OpenFilePanel("Load Settings", "", "txt");
+    //     // Vraag de gebruiker om een bestandspad te kiezen
+    //     string filePath = EditorUtility.OpenFilePanel("Load Settings", "", "txt");
 
-        // Controleer of de gebruiker een pad heeft gekozen
-        if (!string.IsNullOrEmpty(filePath))
-        {
-            // Laad de instellingen vanuit het gekozen bestandspad
-            settingsLoader.LoadSettings(filePath, synthState);
-        }
-    }
+    //     // Controleer of de gebruiker een pad heeft gekozen
+    //     if (!string.IsNullOrEmpty(filePath))
+    //     {
+    //         // Laad de instellingen vanuit het gekozen bestandspad
+    //         settingsLoader.LoadSettings(filePath, synthState);
+    //     }
+    // }
 
     public void StartRecording()
     {
