@@ -29,6 +29,7 @@ public class SynthInfo
     public bool DSPIsActive = false;
     public FMOD.DSP_READ_CALLBACK mReadCallback;
     public FMOD.DSP mCaptureDSP;
+    public FMOD.ChannelGroup channelGroup;
     public readonly object bufferLock = new object();
     public float[] sharedBuffer;
     public GCHandle mObjHandle;

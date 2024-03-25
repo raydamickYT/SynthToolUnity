@@ -104,19 +104,30 @@ public class Synth : MonoBehaviour
     void OnDestroy()
     {
         //release je dsp en group
+        // if (synthState.mObjHandle != null)
+        // {
+        //     if (FMODUnity.RuntimeManager.CoreSystem.getMasterChannelGroup(out masterCG) == FMOD.RESULT.OK)
+        //     {
+        //         if (synthState.mCaptureDSP.hasHandle())
+        //         {
+        //             masterCG.removeDSP(synthState.mCaptureDSP);
+
+        //             // nu kan je eindelijk je dsp zonder problemen releasen
+        //             synthState.mCaptureDSP.release();
+        //         }
+        //     }
+        //     synthState.mObjHandle.Free();
+        // }
+
         if (synthState.mObjHandle != null)
         {
-            if (FMODUnity.RuntimeManager.CoreSystem.getMasterChannelGroup(out masterCG) == FMOD.RESULT.OK)
+            if (synthState.mCaptureDSP.hasHandle())
             {
-                if (synthState.mCaptureDSP.hasHandle())
-                {
-                    masterCG.removeDSP(synthState.mCaptureDSP);
+                synthState.channelGroup.removeDSP(synthState.mCaptureDSP);
 
-                    // nu kan je eindelijk je dsp zonder problemen releasen
-                    synthState.mCaptureDSP.release();
-                }
+                // nu kan je eindelijk je dsp zonder problemen releasen
+                synthState.mCaptureDSP.release();
             }
-            synthState.mObjHandle.Free();
         }
     }
 }
