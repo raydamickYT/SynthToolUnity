@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using FMODUnity;
@@ -13,8 +14,7 @@ public class GameUIManager : MonoBehaviour
     public GameObject settingsPanel; // Verwijzing naar je Settings Panel
     public Button SettingsButton, CloseButton, SaveSettingsBtn, LoadSettingsBtn, RecordButtonStart, RecordButtonStop;
     public Dropdown RecordingOptions;
-    [SerializeField] private AudioRecorder audioRecorder;
-    public int RecordIndex = 0;
+    private AudioRecorder audioRecorder;
 
     private void Start()
     {
@@ -29,30 +29,30 @@ public class GameUIManager : MonoBehaviour
     private void Initialization()
     {
         PopulateDropdownWithRecordDevices();
-        audioRecorder = new(SynthObject, RecordIndex);
+        audioRecorder = new(SynthObject.RecordIndex);
         SettingsButton.onClick.AddListener(ToggleSettingsWindow);
         CloseButton.onClick.AddListener(ToggleSettingsWindow);
         RecordButtonStart.onClick.AddListener(StartRecording);
         RecordButtonStop.onClick.AddListener(StopRecording);
         SaveSettingsBtn.onClick.AddListener(SettingsSaverScript.SaveAllSynthsSettingsWithFileDialog);
         LoadSettingsBtn.onClick.AddListener(settingsLoader.OpenFileBrowser);
-    void PopulateDropdownWithRecordDevices()
-    {
-        FMOD.System system = RuntimeManager.CoreSystem;
-        system.getNumDrivers(out int numRecordDevices);
-
-        RecordingOptions.ClearOptions();
-        for (int i = 0; i < numRecordDevices; i++)
+        void PopulateDropdownWithRecordDevices()
         {
-            system.getRecordDriverInfo(i, out string name, 256, out _, out int sampleRate, out FMOD.SPEAKERMODE speakerMode, out int channels, out _);
-            string deviceInfo = $"Apparaat {i}: {name}";
-            RecordingOptions.options.Add(new Dropdown.OptionData(deviceInfo));
+            FMOD.System system = RuntimeManager.CoreSystem;
+            system.getNumDrivers(out int numRecordDevices);
+
+            RecordingOptions.ClearOptions();
+            for (int i = 0; i < numRecordDevices; i++)
+            {
+                system.getRecordDriverInfo(i, out string name, 256, out _, out int sampleRate, out FMOD.SPEAKERMODE speakerMode, out int channels, out _);
+                string deviceInfo = $"Apparaat {i}: {name}";
+                RecordingOptions.options.Add(new Dropdown.OptionData(deviceInfo));
+            }
+
+            RecordingOptions.RefreshShownValue();
+
+            RecordingOptions.onValueChanged.AddListener(SetSelectedRecordDevice);
         }
-
-        RecordingOptions.RefreshShownValue();
-
-        RecordingOptions.onValueChanged.AddListener(SetSelectedRecordDevice);
-    }
     }
     public void ToggleSettingsWindow()
     {
@@ -62,7 +62,7 @@ public class GameUIManager : MonoBehaviour
     public void SetSelectedRecordDevice(int selectedIndex)
     {
         // FMODUnity.RuntimeManager.CoreSystem.setRecordDriver(selectedIndex);
-        RecordIndex = selectedIndex;
+        SynthObject.RecordIndex = selectedIndex;
         Debug.Log($"Geselecteerd opnameapparaat: {RecordingOptions.options[selectedIndex].text}");
     }
     public void StartRecording()
@@ -72,6 +72,6 @@ public class GameUIManager : MonoBehaviour
 
     public void StopRecording()
     {
-        audioRecorder.StopRecording(SynthInfo);
+        audioRecorder.StopRecording();
     }
 }

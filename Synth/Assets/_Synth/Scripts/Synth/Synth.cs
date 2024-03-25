@@ -11,6 +11,7 @@ public class Synth : MonoBehaviour
     public CreateSynth createSynth;
     public SynthInfo synthState;
     int dspCount = 0;
+    public int RecordIndex = 0;
     public bool SynthIsPlaying = false;
     // public Button OnOff;
 
@@ -34,7 +35,7 @@ public class Synth : MonoBehaviour
         GameManager.Instance.AddSynthToList(this);
         // OnOff.onClick.AddListener(ToggleSynth);
     }
-    
+
     void CheckAudioSettings()
     {
         // Verkrijg het FMOD systeem instance.

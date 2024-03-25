@@ -10,7 +10,7 @@ using System.Collections.Generic; // standalone file browser
 
 public class AudioRecorder
 {
-    Synth voorbeeldScript;
+    // Synth Synth;
     private int sampleRate = 44100; // Standaard sample rate
     private FMOD.System system; // FMOD low-level system instance
     private FMOD.Sound sound; // Sound object to hold the recording
@@ -19,9 +19,9 @@ public class AudioRecorder
     private int bitDepth = 16; //16, 24 of 32
     private int recordIndex;
 
-    public AudioRecorder(Synth _synth,int _index)
+    public AudioRecorder(int _index)
     {
-        voorbeeldScript = _synth;
+        // Synth = _synth;
         recordIndex = _index;
         // Initialize the FMOD system
         system = RuntimeManager.CoreSystem;
@@ -33,6 +33,7 @@ public class AudioRecorder
         FMOD.RESULT result;
         int driverIndex = 5;
         result = system.getDriver(out driverIndex);
+        UnityEngine.Debug.Log(driverIndex);
         if (result != FMOD.RESULT.OK)
         {
             UnityEngine.Debug.LogError("FMOD getDriver failed: " + result);
@@ -69,7 +70,7 @@ public class AudioRecorder
         UnityEngine.Debug.Log("Recording started...");
     }
 
-    public void StopRecording(SynthInfo synthInfo)
+    public void StopRecording()
     {
         if (!isRecording) return; // Check if not currently recording
 
@@ -81,11 +82,11 @@ public class AudioRecorder
         string path = StandaloneFileBrowser.SaveFilePanel("Save Recording", "", "MyRecording", "wav");
         if (!string.IsNullOrEmpty(path))
         {
-            SaveRecording(path, synthInfo);
+            SaveRecording(path);
         }
     }
 
-    private void SaveRecording(string path, SynthInfo synthInfo)
+    private void SaveRecording(string path)
     {
         FMOD.RESULT result;
         IntPtr ptr1 = IntPtr.Zero, ptr2 = IntPtr.Zero;
@@ -94,10 +95,6 @@ public class AudioRecorder
 
         // Eerst ophalen van de geluidslengte
         result = sound.getLength(out length, FMOD.TIMEUNIT.PCMBYTES);
-        UnityEngine.Debug.Log(length);
-        {
-
-        }
         if (result != FMOD.RESULT.OK)
         {
             UnityEngine.Debug.LogError("Failed to get sound length: " + result.ToString());
@@ -125,7 +122,7 @@ public class AudioRecorder
 
         using (FileStream fileStream = new FileStream(path, FileMode.Create))
         {
-            WriteWavHeader(fileStream, audioData.Length, synthInfo.sampleRate, numChannels, bitDepth); // Schrijf een WAV-header naar het bestand.
+            WriteWavHeader(fileStream, audioData.Length, sampleRate, numChannels, bitDepth); // Schrijf een WAV-header naar het bestand.
             fileStream.Write(audioData, 0, audioData.Length); // Schrijf de audio data.
         }
 
