@@ -7,8 +7,6 @@ public class UIManager : MonoBehaviour
 {
     public Synth SynthObject;
     private SynthInfo SynthInfo;
-    public static int RecordIndex = 0;
-    [SerializeField] private AudioRecorder audioRecorder;
     public Button OnOffBtn;
     public Dropdown ChangeWave, dropdown;
     public Slider FrequencySlider, VolumeSlider;
@@ -48,13 +46,6 @@ public class UIManager : MonoBehaviour
         }
     }
 
-
-    public void SetSelectedRecordDevice(int selectedIndex)
-    {
-        // FMODUnity.RuntimeManager.CoreSystem.setRecordDriver(selectedIndex);
-        RecordIndex = selectedIndex;
-        Debug.Log($"Geselecteerd opnameapparaat: {dropdown.options[selectedIndex].text}");
-    }
     public void ToggleSynth()
     {
         SynthIsPlaying = !SynthIsPlaying;

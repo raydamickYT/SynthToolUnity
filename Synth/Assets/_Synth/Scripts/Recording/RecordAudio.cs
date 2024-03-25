@@ -8,28 +8,30 @@ using System.Runtime.InteropServices;
 using FMODUnityResonance;
 using System.Collections.Generic; // standalone file browser
 
-public class AudioRecorder : MonoBehaviour
+public class AudioRecorder
 {
-    [SerializeField] Synth voorbeeldScript;
-    [SerializeField] private int sampleRate = 44100; // Standaard sample rate
+    Synth voorbeeldScript;
+    private int sampleRate = 44100; // Standaard sample rate
     private FMOD.System system; // FMOD low-level system instance
     private FMOD.Sound sound; // Sound object to hold the recording
     private bool isRecording = false; // Flag to check if currently recording
     private int numChannels = 2; // Aantal kanalen (stereo)
-    private int BitDepth = 16; //16, 24 of 32
-    private int AudioDeviceIndex;
+    private int bitDepth = 16; //16, 24 of 32
+    private int recordIndex;
 
-    void Start()
+    public AudioRecorder(Synth _synth,int _index)
     {
+        voorbeeldScript = _synth;
+        recordIndex = _index;
         // Initialize the FMOD system
         system = RuntimeManager.CoreSystem;
         StoreActiveAudioOutputIndex();
-
     }
+
     void StoreActiveAudioOutputIndex()
     {
         FMOD.RESULT result;
-        int driverIndex =5;
+        int driverIndex = 5;
         result = system.getDriver(out driverIndex);
         if (result != FMOD.RESULT.OK)
         {
@@ -62,7 +64,7 @@ public class AudioRecorder : MonoBehaviour
             return;
         }
 
-        system.recordStart(UIManager.RecordIndex, sound, true);
+        system.recordStart(recordIndex, sound, true);
         isRecording = true;
         UnityEngine.Debug.Log("Recording started...");
     }
@@ -123,7 +125,7 @@ public class AudioRecorder : MonoBehaviour
 
         using (FileStream fileStream = new FileStream(path, FileMode.Create))
         {
-            WriteWavHeader(fileStream, audioData.Length, synthInfo.sampleRate, numChannels, BitDepth); // Schrijf een WAV-header naar het bestand.
+            WriteWavHeader(fileStream, audioData.Length, synthInfo.sampleRate, numChannels, bitDepth); // Schrijf een WAV-header naar het bestand.
             fileStream.Write(audioData, 0, audioData.Length); // Schrijf de audio data.
         }
 
