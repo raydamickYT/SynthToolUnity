@@ -39,8 +39,6 @@ public class UIManager : MonoBehaviour
             WaveChanged(ChangeWave);
         });
 
-        PopulateDropdownWithRecordDevices();
-
         OnOffBtn.onClick.AddListener(ToggleSynth);
         FMODUnity.RuntimeManager.CoreSystem.getNumDrivers(out int test);
         for (int i = 0; i < test; i++)
@@ -50,24 +48,6 @@ public class UIManager : MonoBehaviour
         }
     }
 
-
-    void PopulateDropdownWithRecordDevices()
-    {
-        FMOD.System system = RuntimeManager.CoreSystem;
-        system.getNumDrivers(out int numRecordDevices);
-
-        dropdown.ClearOptions();
-        for (int i = 0; i < numRecordDevices; i++)
-        {
-            system.getRecordDriverInfo(i, out string name, 256, out _, out int sampleRate, out FMOD.SPEAKERMODE speakerMode, out int channels, out _);
-            string deviceInfo = $"Apparaat {i}: {name}";
-            dropdown.options.Add(new Dropdown.OptionData(deviceInfo));
-        }
-
-        dropdown.RefreshShownValue();
-
-        dropdown.onValueChanged.AddListener(SetSelectedRecordDevice);
-    }
 
     public void SetSelectedRecordDevice(int selectedIndex)
     {
@@ -144,13 +124,5 @@ public class UIManager : MonoBehaviour
         SynthInfo.volume = vol;
     }
 
-    public void StartRecording()
-    {
-        audioRecorder.StartRecording();
-    }
 
-    public void StopRecording()
-    {
-        audioRecorder.StopRecording(SynthInfo);
-    }
 }
