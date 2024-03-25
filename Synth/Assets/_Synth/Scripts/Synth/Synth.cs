@@ -19,54 +19,10 @@ public class Synth : MonoBehaviour
     {
         synthState = new();
         synthState.name = Name;
-        // OnOff.onClick.AddListener(ToggleSynth);
-
-    }
-    private void Start()
-    {
         CheckAudioSettings();
         createSynth = new(synthState, dspCount);
         createSynth.CreateDSP();
-        synthState.mCaptureDSP.setActive(true);
-        synthState.mCaptureDSP.getActive(out bool test);
-        Debug.Log(test);
-    }
-
-    void Update()
-    {
-        ToggleSynth();
-    }
-    public void ToggleSynth()
-    {
-        synthState.DSPIsActive = SynthIsPlaying;
-        switch (SynthIsPlaying)
-        {
-            case true:
-                StopSynth();
-                // SynthIsPlaying = false;
-                break;
-            case false:
-                StartSynth();
-                // SynthIsPlaying = true;
-                break;
-            default:
-        }
-    }
-    private void StartSynth()
-    {
-        Debug.Log("synth staat aan");
-        // Synth.instance.CreateCustomDSP();
-        // Synth.mCaptureDSP.setActive(true); // zet de dsp op actief.
-        synthState.mCaptureDSP.setActive(true);
-
-    }
-
-    private void StopSynth()
-    {
-        Debug.Log("synth staat uit");
-        // Synth.instance.GlobalDSP.release();
-        // SynthInfo.mCaptureDSP.setActive(false); // zet de dsp op inactief. 
-        synthState.mCaptureDSP.setActive(false);
+        // OnOff.onClick.AddListener(ToggleSynth);
 
     }
     void CheckAudioSettings()
@@ -101,49 +57,13 @@ public class Synth : MonoBehaviour
         Debug.Log($"Aantal actieve DSP's: {dspCount}");
 
     }
+    public float[] GetCurrentAudioBuffer()
+    {
+        // Retourneer hier de recente audio buffer data
+        // Dit hangt af van hoe je audio data genereert of opslaat in je synth
+        return synthState.sharedBuffer;
+    }
 
-    public void SetFrequency(float vol)
-    {
-        synthState.sineFrequency = vol;
-    }
-    public float GetFrequency()
-    {
-        return synthState.Frequency;
-    }
-    public float GetVolume()
-    {
-        return synthState.volume;
-    }
-    public int GetWaveForm()
-    {
-        return (int)synthState.CurrentWaveForm;
-    }
-    public void SetVolume(float vol)
-    {
-        synthState.volume = vol;
-    }
-    public void SetWaveForm(Dropdown change)
-    {
-        Debug.Log("dropdown changed to value: " + change.value);
-        switch (change.value)
-        {
-            case 0: //sine wave
-                synthState.CurrentWaveForm = WaveForm.Sine;
-                break;
-            case 1: // sawtooth
-                synthState.CurrentWaveForm = WaveForm.Sawtooth;
-                break;
-            case 2: //square
-                synthState.CurrentWaveForm = WaveForm.Square;
-                break;
-            case 3: //triangle
-                synthState.CurrentWaveForm = WaveForm.Triangle;
-                break;
-            default:
-                break;
-        }
-
-    }
 
     void OnDestroy()
     {

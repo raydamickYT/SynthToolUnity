@@ -26,6 +26,7 @@ public class UIManager : MonoBehaviour
     private void Initialization()
     {
         SynthInfo.mCaptureDSP.getActive(out SynthIsPlaying);
+        Debug.Log(SynthIsPlaying);
 
         FrequencySlider.value = SynthInfo.sineFrequency;
         FrequencySlider.onValueChanged.AddListener(ChangeFreq);
@@ -76,18 +77,38 @@ public class UIManager : MonoBehaviour
     }
     public void ToggleSynth()
     {
+        SynthIsPlaying = !SynthIsPlaying;
+        SynthInfo.DSPIsActive = SynthIsPlaying;
+
         switch (SynthIsPlaying)
         {
             case true:
                 StopSynth();
-                SynthIsPlaying = false;
+                // SynthIsPlaying = false;
                 break;
             case false:
                 StartSynth();
-                SynthIsPlaying = true;
+                // SynthIsPlaying = true;
                 break;
             default:
         }
+    }
+    private void StartSynth()
+    {
+        Debug.Log("synth staat aan");
+        // Synth.instance.CreateCustomDSP();
+        // Synth.mCaptureDSP.setActive(true); // zet de dsp op actief.
+        SynthInfo.mCaptureDSP.setActive(true);
+
+    }
+
+    private void StopSynth()
+    {
+        Debug.Log("synth staat uit");
+        // Synth.instance.GlobalDSP.release();
+        // SynthInfo.mCaptureDSP.setActive(false); // zet de dsp op inactief. 
+        SynthInfo.mCaptureDSP.setActive(false);
+
     }
 
     public void WaveChanged(Dropdown change)
@@ -111,21 +132,6 @@ public class UIManager : MonoBehaviour
                 break;
         }
 
-    }
-    private void StartSynth()
-    {
-        Debug.Log("synth staat aan");
-        // Synth.instance.CreateCustomDSP();
-        SynthInfo.mCaptureDSP.setActive(true); // zet de dsp op actief.
-
-    }
-
-    private void StopSynth()
-    {
-        Debug.Log("synth staat uit");
-        // Synth.instance.GlobalDSP.release();
-        SynthInfo.mCaptureDSP.setActive(false); // zet de dsp op inactief. 
-        Debug.Log(SynthInfo.mCaptureDSP.getActive(out bool test));
     }
 
     private void ChangeFreq(float vol)

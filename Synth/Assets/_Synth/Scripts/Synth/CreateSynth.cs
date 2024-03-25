@@ -16,7 +16,7 @@ public class CreateSynth
     public void CreateDSP()
     {
         // Assign the callback to a member variable to avoid garbage collection
-        synthInfo.mReadCallback = DspCount == 1 ? DSPCallback.CaptureDSPReadCallback : DSPCallback.CaptureDSPReadCallback2;
+        synthInfo.mReadCallback = DSPCallback.CaptureDSPReadCallback;
 
 
         // Allocate a data buffer large enough for 8 channels
