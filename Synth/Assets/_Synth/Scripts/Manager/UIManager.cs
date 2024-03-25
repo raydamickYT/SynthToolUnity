@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    public Synth SynthObject;
     private SynthInfo SynthInfo;
     public static int RecordIndex = 0;
     [SerializeField] private AudioRecorder audioRecorder;
@@ -15,7 +16,11 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        SynthInfo = SynthInfo.instance;
+        if (SynthInfo == null && SynthObject != null)
+        {
+            SynthInfo = SynthObject.synthState;
+            // Debug.LogError("Synth niet assigned in: " + gameObject.name);
+        }
         Initialization();
     }
     private void Initialization()
@@ -42,8 +47,6 @@ public class UIManager : MonoBehaviour
             RuntimeManager.CoreSystem.getRecordDriverInfo(i, out string name, 256, out _, out int sampleRate, out FMOD.SPEAKERMODE speakerMode, out int channels, out _);
             UnityEngine.Debug.Log($"Apparaat {i}: {name}, SampleRate: {sampleRate}, SpeakerMode: {speakerMode}, Channels: {channels}");
         }
-        UnityEngine.Debug.Log(name);
-
     }
 
 
@@ -122,6 +125,7 @@ public class UIManager : MonoBehaviour
         Debug.Log("synth staat uit");
         // Synth.instance.GlobalDSP.release();
         SynthInfo.mCaptureDSP.setActive(false); // zet de dsp op inactief. 
+        Debug.Log(SynthInfo.mCaptureDSP.getActive(out bool test));
     }
 
     private void ChangeFreq(float vol)
@@ -141,6 +145,6 @@ public class UIManager : MonoBehaviour
 
     public void StopRecording()
     {
-        audioRecorder.StopRecording();
+        audioRecorder.StopRecording(SynthInfo);
     }
 }

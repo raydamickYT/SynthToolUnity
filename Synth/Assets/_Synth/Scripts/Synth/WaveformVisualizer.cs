@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class WaveformVisualizer : MonoBehaviour
 {
+    public SynthInfo synthInfo;
     public RawImage rawImage; // Verbind dit met je RawImage component in de Inspector
     public int textureWidth = 1024;
     public int textureHeight = 128;
@@ -18,12 +19,12 @@ public class WaveformVisualizer : MonoBehaviour
     private void Update()
     {
         float[] bufferCopy;
-        lock (SynthInfo.instance.bufferLock)
+        lock (synthInfo.bufferLock)
         {
-            if (SynthInfo.instance.sharedBuffer != null)
+            if (synthInfo.sharedBuffer != null)
             {
-                bufferCopy = new float[SynthInfo.instance.sharedBuffer.Length];
-                Array.Copy(SynthInfo.instance.sharedBuffer, bufferCopy, SynthInfo.instance.sharedBuffer.Length);
+                bufferCopy = new float[synthInfo.sharedBuffer.Length];
+                Array.Copy(synthInfo.sharedBuffer, bufferCopy, synthInfo.sharedBuffer.Length);
             }
             else
             {

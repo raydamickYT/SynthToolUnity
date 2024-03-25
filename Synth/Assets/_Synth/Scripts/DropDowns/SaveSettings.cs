@@ -15,7 +15,8 @@ public class SaveSettings : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        globalSynthSettings = SynthInfo.instance;
+        // globalSynthSettings = SynthInfo.instance;
+
 
         dropdown = GetComponentInChildren<Dropdown>();
         dropdown.gameObject.SetActive(false);
@@ -49,14 +50,14 @@ public class SaveSettings : MonoBehaviour
 
     public void SaveSynthSettings()
     {
-        SynthInfo synthState = SynthInfo.instance;
-        settingsSaver.SaveSettingsWithFileDialog(synthState);
+        // SynthInfo synthState = SynthInfo.instance;
+        // settingsSaver.SaveSettingsWithFileDialog(synthState);
     }
 
 
     public void LoadSettings()
     {
-        SynthInfo synthState = SynthInfo.instance;
+        // SynthInfo synthState = SynthInfo.instance;
 
         // Vraag de gebruiker om een bestand te kiezen om te laden
         var extensions = new[] {
@@ -74,7 +75,7 @@ public class SaveSettings : MonoBehaviour
             if (!string.IsNullOrEmpty(filePath))
             {
                 // Laad de instellingen vanuit het gekozen bestandspad
-                settingsLoader.LoadSettings(filePath, synthState);
+                // settingsLoader.LoadSettings(filePath, synthState);
             }
         }
     }

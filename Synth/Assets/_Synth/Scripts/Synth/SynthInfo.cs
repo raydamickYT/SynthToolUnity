@@ -16,7 +16,8 @@ public enum WaveForm
 
 public class SynthInfo
 {
-    public static SynthInfo instance;
+    // public static SynthInfo instance;
+    public string name;
     public float Frequency;
     public uint SamplingFrequency;
     public float CarrierPhase;
@@ -40,10 +41,10 @@ public class SynthInfo
     public SynthWaves synthWaves = new();
     public SynthInfo()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
+        // if (instance == null)
+        // {
+        //     instance = this;
+        // }
         Frequency = 0;
         SamplingFrequency = 0;
         CurrentWaveForm = WaveForm.Sine; //sine is gwn de default
@@ -52,17 +53,17 @@ public class SynthInfo
 
 public class SynthWaves
 {
-    public float GenerateSineWave(float frequency, uint sampleRate, ref float phase, uint index)
+    public float GenerateSineWave(float frequency, uint sampleRate, ref float phase, uint index, float volume)
     {
         float sample = Mathf.Sin(phase);
         float phaseIncrement = 2f * Mathf.PI * frequency / sampleRate;
         phase += phaseIncrement;
         if (phase >= 2f * Mathf.PI) phase -= 2f * Mathf.PI;
 
-        return sample * SynthInfo.instance.volume;
+        return sample * volume;
     }
 
-    public float GenerateSawtoothWave(float frequency, uint sampleRate, ref float phase, uint index)
+    public float GenerateSawtoothWave(float frequency, uint sampleRate, ref float phase, uint index, float volume)
     {
         // Bereken de fase-increment per sample
         float phaseIncrement = 2f * Mathf.PI * frequency / sampleRate;
@@ -78,12 +79,12 @@ public class SynthWaves
         // De fase loopt lineair op, dus we mappen deze direct naar onze output
         float sawtooth = (phase / (2f * Mathf.PI)) * 2f - 1f;
 
-        return sawtooth * SynthInfo.instance.volume;
+        return sawtooth * volume;
     }
 
 
 
-    public float GenerateSquareWave(uint index, uint sampleRate, float frequency, ref float phase)
+    public float GenerateSquareWave(uint index, uint sampleRate, float frequency, ref float phase, float volume)
     {
         // Bereken de fase-increment per sample
         float phaseIncrement = 2f * Mathf.PI * frequency / sampleRate;
@@ -101,9 +102,9 @@ public class SynthWaves
         float position = (index + phase / phaseIncrement) % period;
 
         // De golf wisselt tussen 1 en -1 halverwege elke periode
-        return (position < period / 2 ? 1f : -1f) * SynthInfo.instance.volume;
+        return (position < period / 2 ? 1f : -1f) * volume;
     }
-    public float GenerateTriangleWave(uint index, uint sampleRate, float frequency, ref float phase)
+    public float GenerateTriangleWave(uint index, uint sampleRate, float frequency, ref float phase, float volume)
     {
         // Bereken de golfperiode
         float period = sampleRate / frequency;
@@ -117,11 +118,11 @@ public class SynthWaves
 
         // Formule voor de driehoeksgolf aangepast om fase te incorporeren
         if (position < 0.25f)
-            return (4f * position) * SynthInfo.instance.volume; // Oplopend van 0 naar 1
+            return (4f * position) * volume; // Oplopend van 0 naar 1
         else if (position < 0.75f)
-            return (2f - 4f * position) * SynthInfo.instance.volume; // Aflopend van 1 naar -1
+            return (2f - 4f * position) * volume; // Aflopend van 1 naar -1
         else
-            return (-4f + 4f * position) * SynthInfo.instance.volume; // Oplopend van -1 naar 0
+            return (-4f + 4f * position) * volume; // Oplopend van -1 naar 0
     }
 }
 

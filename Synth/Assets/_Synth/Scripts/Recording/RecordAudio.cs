@@ -26,7 +26,6 @@ public class AudioRecorder : MonoBehaviour
         StoreActiveAudioOutputIndex();
 
     }
-    // Start is called before the first frame update
     void StoreActiveAudioOutputIndex()
     {
         FMOD.RESULT result;
@@ -38,7 +37,7 @@ public class AudioRecorder : MonoBehaviour
             return;
         }
 
-        UnityEngine.Debug.Log($"Actieve audio output index: {driverIndex}");
+        // UnityEngine.Debug.Log($"Actieve audio output index: {driverIndex}");
         // Je kunt hier de opgeslagen driverIndex gebruiken zoals nodig voor je applicatie
     }
 
@@ -68,7 +67,7 @@ public class AudioRecorder : MonoBehaviour
         UnityEngine.Debug.Log("Recording started...");
     }
 
-    public void StopRecording()
+    public void StopRecording(SynthInfo synthInfo)
     {
         if (!isRecording) return; // Check if not currently recording
 
@@ -80,11 +79,11 @@ public class AudioRecorder : MonoBehaviour
         string path = StandaloneFileBrowser.SaveFilePanel("Save Recording", "", "MyRecording", "wav");
         if (!string.IsNullOrEmpty(path))
         {
-            SaveRecording(path);
+            SaveRecording(path, synthInfo);
         }
     }
 
-    private void SaveRecording(string path)
+    private void SaveRecording(string path, SynthInfo synthInfo)
     {
         FMOD.RESULT result;
         IntPtr ptr1 = IntPtr.Zero, ptr2 = IntPtr.Zero;
@@ -124,13 +123,12 @@ public class AudioRecorder : MonoBehaviour
 
         using (FileStream fileStream = new FileStream(path, FileMode.Create))
         {
-            WriteWavHeader(fileStream, audioData.Length, SynthInfo.instance.sampleRate, numChannels, BitDepth); // Schrijf een WAV-header naar het bestand.
+            WriteWavHeader(fileStream, audioData.Length, synthInfo.sampleRate, numChannels, BitDepth); // Schrijf een WAV-header naar het bestand.
             fileStream.Write(audioData, 0, audioData.Length); // Schrijf de audio data.
         }
 
         UnityEngine.Debug.Log($"Recording saved to: {path}");
 
-        UnityEngine.Debug.Log(SynthInfo.instance.mChannels);
         // De rest van je SaveRecording logica hier...
     }
 
