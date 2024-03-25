@@ -27,10 +27,11 @@ public class Synth : MonoBehaviour
         CheckAudioSettings();
         createSynth = new(synthState, dspCount);
         createSynth.CreateDSP();
-        synthState.mCaptureDSP.setActive(false);
+        synthState.mCaptureDSP.setActive(true);
         synthState.mCaptureDSP.getActive(out bool test);
         Debug.Log(test);
     }
+
     void Update()
     {
         ToggleSynth();
@@ -98,6 +99,49 @@ public class Synth : MonoBehaviour
             // dspNode.release(); // Zorg ervoor dat je de DSP vrijgeeft om memory leaks te voorkomen.
         }
         Debug.Log($"Aantal actieve DSP's: {dspCount}");
+
+    }
+
+    public void SetFrequency(float vol)
+    {
+        synthState.sineFrequency = vol;
+    }
+    public float GetFrequency()
+    {
+        return synthState.Frequency;
+    }
+    public float GetVolume()
+    {
+        return synthState.volume;
+    }
+    public int GetWaveForm()
+    {
+        return (int)synthState.CurrentWaveForm;
+    }
+    public void SetVolume(float vol)
+    {
+        synthState.volume = vol;
+    }
+    public void SetWaveForm(Dropdown change)
+    {
+        Debug.Log("dropdown changed to value: " + change.value);
+        switch (change.value)
+        {
+            case 0: //sine wave
+                synthState.CurrentWaveForm = WaveForm.Sine;
+                break;
+            case 1: // sawtooth
+                synthState.CurrentWaveForm = WaveForm.Sawtooth;
+                break;
+            case 2: //square
+                synthState.CurrentWaveForm = WaveForm.Square;
+                break;
+            case 3: //triangle
+                synthState.CurrentWaveForm = WaveForm.Triangle;
+                break;
+            default:
+                break;
+        }
 
     }
 

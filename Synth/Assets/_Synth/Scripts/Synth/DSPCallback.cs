@@ -67,7 +67,6 @@ public class DSPCallback
         // Copy the inbuffer to the outbuffer so we can still hear it
         // Vul het geheugen met de gegenereerde sample voor alle kanalen.
         Marshal.Copy(obj.sharedBuffer, 0, outbuffer, obj.sharedBuffer.Length);// kopieer de buffer naar de geheugen
-        Debug.Log("dsp callback 1");
         return FMOD.RESULT.OK;
     }
 
