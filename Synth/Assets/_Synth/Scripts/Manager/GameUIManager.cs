@@ -8,8 +8,10 @@ public class GameUIManager : MonoBehaviour
 {
     public Synth SynthObject;
     private SynthInfo SynthInfo;
+    public SettingsSaver SettingsSaverScript = new();
+    public SettingsLoader settingsLoader = new();
     public GameObject settingsPanel; // Verwijzing naar je Settings Panel
-    public Button SettingsButton, CloseButton, RecordButtonStart, RecordButtonStop;
+    public Button SettingsButton, CloseButton, SaveSettingsBtn, LoadSettingsBtn, RecordButtonStart, RecordButtonStop;
     public Dropdown RecordingOptions;
     [SerializeField] private AudioRecorder audioRecorder;
     public int RecordIndex = 0;
@@ -32,12 +34,8 @@ public class GameUIManager : MonoBehaviour
         CloseButton.onClick.AddListener(ToggleSettingsWindow);
         RecordButtonStart.onClick.AddListener(StartRecording);
         RecordButtonStop.onClick.AddListener(StopRecording);
-    }
-    public void ToggleSettingsWindow()
-    {
-        // Schakelt de zichtbaarheid van het settingsPanel
-        settingsPanel.SetActive(!settingsPanel.activeSelf);
-    }
+        SaveSettingsBtn.onClick.AddListener(SettingsSaverScript.SaveAllSynthsSettingsWithFileDialog);
+        LoadSettingsBtn.onClick.AddListener(settingsLoader.OpenFileBrowser);
     void PopulateDropdownWithRecordDevices()
     {
         FMOD.System system = RuntimeManager.CoreSystem;
@@ -55,7 +53,12 @@ public class GameUIManager : MonoBehaviour
 
         RecordingOptions.onValueChanged.AddListener(SetSelectedRecordDevice);
     }
-
+    }
+    public void ToggleSettingsWindow()
+    {
+        // Schakelt de zichtbaarheid van het settingsPanel
+        settingsPanel.SetActive(!settingsPanel.activeSelf);
+    }
     public void SetSelectedRecordDevice(int selectedIndex)
     {
         // FMODUnity.RuntimeManager.CoreSystem.setRecordDriver(selectedIndex);

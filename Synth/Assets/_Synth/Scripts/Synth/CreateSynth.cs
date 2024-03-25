@@ -49,8 +49,9 @@ public class CreateSynth
             {
                 if (FMODUnity.RuntimeManager.CoreSystem.createDSP(ref desc, out synthInfo.mCaptureDSP) == FMOD.RESULT.OK) //hier wordt de dsp aangemaakt
                 {
-                    synthInfo.mCaptureDSP.setActive(false); //zet hem tijdelijk op inactief, dan kunnen we dat later aanpassen.
-                    synthInfo.mCaptureDSP.getActive(out synthInfo.DSPIsActive); //sla het gelijk op zodat we het in andere scripts kunnen gebruiken.
+                    synthInfo.mCaptureDSP.setActive(true); //zet hem tijdelijk op inactief, dan kunnen we dat later aanpassen.
+                    synthInfo.mCaptureDSP.getActive(out bool temp);
+                    synthInfo.DSPIsActive = temp; //sla het gelijk op zodat we het in andere scripts kunnen gebruiken.
                     synthInfo.channelGroup = synthChannelGroup;
                     Debug.Log("synth is: " + synthInfo.DSPIsActive);
                     if (synthChannelGroup.addDSP(FMOD.CHANNELCONTROL_DSP_INDEX.HEAD, synthInfo.mCaptureDSP) != FMOD.RESULT.OK) //hier voegen we hem toe aan de mastergroup (hierdoor kunnen we hem horen.)

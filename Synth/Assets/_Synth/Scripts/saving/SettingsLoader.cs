@@ -1,65 +1,103 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
+using SFB;
 
-public class SettingsLoader : MonoBehaviour
+public class SettingsLoader
 {
-    [SerializeField] private UIManager uIManager;
+    public void OpenFileBrowser()
+    {
+        // Open een bestandskiezer dialoog en vraag de gebruiker om een bestand te selecteren
+        var paths = StandaloneFileBrowser.OpenFilePanel("Title", "", "", false);
+
+        // Controleer of de gebruiker een bestand heeft geselecteerd
+        if (paths.Length > 0)
+        {
+            string filePath = paths[0];
+            Debug.Log("Geselecteerd bestandspad: " + filePath);
+            LoadSettings(filePath);
+        }
+    }
+
     // Methode om instellingen te laden vanuit een bestand
-    public void LoadSettings(string filePath, SynthInfo _state)
+    private void LoadSettings(string filePath)
     {
         try
         {
-            // Lees alle regels uit het opgegeven bestand
             string[] lines = File.ReadAllLines(filePath);
+            SynthInfo currentSynthState = null;
 
-            // Loop door elke regel en verwerk de instellingen
             foreach (string line in lines)
             {
-                // Split de regel op de ':' om de sleutel en waarde te scheiden
-                string[] parts = line.Split(':');
-                string key = parts[0].Trim();
-                string value = parts[1].Trim();
-
-                // Verwerk de instelling (hier gaan we ervan uit dat elke instelling slechts één woord is)
-                switch (key)
+                if (line.StartsWith("[") && line.EndsWith("]"))
                 {
-                    case "Frequency":
-                        _state.Frequency = float.Parse(value);
-                        break;
-                    case "SamplingFrequency":
-                        _state.SamplingFrequency = uint.Parse(value);
-                        break;
-                    case "CarrierPhase":
-                        _state.CarrierPhase = float.Parse(value);
-                        break;
-                    case "currentWaveForm":
-                        // Omzetten van string naar enum
-                        _state.CurrentWaveForm = (WaveForm)Enum.Parse(typeof(WaveForm), value);
-                        break;
-                    // Voeg hier meer cases toe voor andere instellingen indien nodig
-                    default:
-                        Debug.LogWarning("Unknown setting: " + key);
-                        break;
+                    // Extract synth name from the section
+                    string synthName = line.Trim('[', ']');
+                    // Find the corresponding Synth based on its name
+                    var synth = GameManager.Instance.synths.FirstOrDefault(s => s.name == synthName);
+                    if (synth != null)
+                    {
+                        currentSynthState = synth.synthState;
+                    }
+                }
+                else if (currentSynthState != null && line.Contains(":"))
+                {
+                    // Process the settings
+                    string[] parts = line.Split(':');
+                    if (parts.Length < 2) continue; // Guard clause for malformed lines
+
+                    string key = parts[0].Trim();
+                    string value = parts[1].Trim();
+
+                    switch (key)
+                    {
+                        case "Frequency":
+                            currentSynthState.sineFrequency = float.Parse(value);
+                            break;
+                        case "SamplingFrequency":
+                            currentSynthState.SamplingFrequency = uint.Parse(value);
+                            break;
+                        case "CarrierPhase":
+                            currentSynthState.CarrierPhase = float.Parse(value);
+                            break;
+                        case "Volume":
+                            currentSynthState.volume = float.Parse(value);
+                            break;
+                        case "Enabled":
+                            if (bool.TryParse(value, out bool result))
+                            {
+                                Debug.Log(currentSynthState.DSPIsActive);
+                                currentSynthState.DSPIsActive = result;
+                                Debug.Log(currentSynthState.DSPIsActive);
+                            }
+                            else
+                            {
+                                Debug.LogWarning("Onjuiste waarde voor Enabled: " + value);
+                            }
+                            break;
+                        case "currentWaveForm":
+                            WaveForm waveFormResult;
+                            if (Enum.TryParse(value, out waveFormResult))
+                            {
+                                currentSynthState.CurrentWaveForm = waveFormResult;
+                            }
+                            break;
+                        // Add more cases as needed
+                        default:
+                            Debug.LogWarning($"Unknown setting '{key}'");
+                            break;
+                    }
                 }
             }
 
-            Debug.Log("Settings loaded successfully.");
+            Debug.Log("Settings loaded successfully for all synths.");
         }
         catch (Exception e)
         {
-            Debug.LogError("Error loading settings: " + e.Message);
+            Debug.LogError($"Error loading settings: {e.Message}");
         }
-        ApplySettings(_state);
     }
 
 
-    void ApplySettings(SynthInfo _state)
-    {
-        //uimanager updaten
-        uIManager.ChangeWave.value = (int)_state.CurrentWaveForm;
-        uIManager.FrequencySlider.value = _state.Frequency;
-    }
 }

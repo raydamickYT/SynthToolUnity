@@ -10,7 +10,6 @@ public class UIManager : MonoBehaviour
     public Button OnOffBtn;
     public Dropdown ChangeWave, dropdown;
     public Slider FrequencySlider, VolumeSlider;
-    private bool SynthIsPlaying = true;
 
     private void Start()
     {
@@ -23,8 +22,8 @@ public class UIManager : MonoBehaviour
     }
     private void Initialization()
     {
-        SynthInfo.mCaptureDSP.getActive(out SynthIsPlaying);
-        Debug.Log(SynthIsPlaying);
+        SynthInfo.OnDSPIsActiveChanged += DSPIsActiveChanged;
+        // SynthInfo.mCaptureDSP.getActive(out SynthObject.synthState.DSPIsActive);
 
         FrequencySlider.value = SynthInfo.sineFrequency;
         FrequencySlider.onValueChanged.AddListener(ChangeFreq);
@@ -42,24 +41,38 @@ public class UIManager : MonoBehaviour
         for (int i = 0; i < test; i++)
         {
             RuntimeManager.CoreSystem.getRecordDriverInfo(i, out string name, 256, out _, out int sampleRate, out FMOD.SPEAKERMODE speakerMode, out int channels, out _);
-            UnityEngine.Debug.Log($"Apparaat {i}: {name}, SampleRate: {sampleRate}, SpeakerMode: {speakerMode}, Channels: {channels}");
+            // UnityEngine.Debug.Log($"Apparaat {i}: {name}, SampleRate: {sampleRate}, SpeakerMode: {speakerMode}, Channels: {channels}");
         }
     }
-
+    private void DSPIsActiveChanged(bool isActive)
+    {
+        Debug.Log("we zitten hier");
+        OnDSPActiveChanged(isActive);
+    }
     public void ToggleSynth()
     {
-        SynthIsPlaying = !SynthIsPlaying;
-        SynthInfo.DSPIsActive = SynthIsPlaying;
+        SynthInfo.DSPIsActive = !SynthInfo.DSPIsActive;
 
-        switch (SynthIsPlaying)
+        switch (SynthInfo.DSPIsActive)
         {
             case true:
                 StopSynth();
-                // SynthIsPlaying = false;
                 break;
             case false:
                 StartSynth();
-                // SynthIsPlaying = true;
+                break;
+            default:
+        }
+    }
+    public void OnDSPActiveChanged(bool active)
+    {
+        switch (active)
+        {
+            case true:
+                StopSynth();
+                break;
+            case false:
+                StartSynth();
                 break;
             default:
         }
@@ -67,8 +80,7 @@ public class UIManager : MonoBehaviour
     private void StartSynth()
     {
         Debug.Log("synth staat aan");
-        // Synth.instance.CreateCustomDSP();
-        // Synth.mCaptureDSP.setActive(true); // zet de dsp op actief.
+        // zet de dsp op actief.
         SynthInfo.mCaptureDSP.setActive(true);
 
     }
@@ -76,15 +88,13 @@ public class UIManager : MonoBehaviour
     private void StopSynth()
     {
         Debug.Log("synth staat uit");
-        // Synth.instance.GlobalDSP.release();
-        // SynthInfo.mCaptureDSP.setActive(false); // zet de dsp op inactief. 
+        // zet de dsp op inactief. 
         SynthInfo.mCaptureDSP.setActive(false);
 
     }
 
     public void WaveChanged(Dropdown change)
     {
-        Debug.Log("dropdown changed to value: " + change.value);
         switch (change.value)
         {
             case 0: //sine wave
@@ -114,6 +124,11 @@ public class UIManager : MonoBehaviour
     {
         SynthInfo.volume = vol;
     }
-
-
+    private void OnDestroy()
+    {
+        if (SynthInfo != null)
+        {
+            SynthInfo.OnDSPIsActiveChanged -= DSPIsActiveChanged;
+        }
+    }
 }

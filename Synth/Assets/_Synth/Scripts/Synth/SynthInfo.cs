@@ -18,7 +18,6 @@ public class SynthInfo
 {
     // public static SynthInfo instance;
     public string name;
-    public float Frequency;
     public uint SamplingFrequency;
     public float CarrierPhase;
     public float[] mDataBuffer;
@@ -26,7 +25,22 @@ public class SynthInfo
     [Range(0f, 1f)]
     public float volume = 0.5f; // Standaard volume op 50%
     public float savedSampleValue;
-    public bool DSPIsActive = false;
+    private bool dSPIsActive = false;
+    public event Action<bool> OnDSPIsActiveChanged;
+
+    public bool DSPIsActive
+    {
+        get => dSPIsActive;
+        set
+        {
+            if (dSPIsActive != value)
+            {
+                Debug.Log("Waarom werk je niet " + value);
+                dSPIsActive = value;
+                OnDSPIsActiveChanged?.Invoke(dSPIsActive);
+            }
+        }
+    }
     public FMOD.DSP_READ_CALLBACK mReadCallback;
     public FMOD.DSP mCaptureDSP;
     public FMOD.ChannelGroup channelGroup;
@@ -46,8 +60,7 @@ public class SynthInfo
         // {
         //     instance = this;
         // }
-        Frequency = 0;
-        SamplingFrequency = 0;
+        SamplingFrequency = 44100;
         CurrentWaveForm = WaveForm.Sine; //sine is gwn de default
     }
 }

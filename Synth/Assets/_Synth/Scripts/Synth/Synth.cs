@@ -17,14 +17,24 @@ public class Synth : MonoBehaviour
 
     private void Awake()
     {
-        synthState = new();
-        synthState.name = Name;
+        if (synthState == null)
+        {
+            synthState = new()
+            {
+                name = Name
+            };
+        }
         CheckAudioSettings();
-        createSynth = new(synthState, dspCount);
-        createSynth.CreateDSP();
-        // OnOff.onClick.AddListener(ToggleSynth);
+        if (createSynth == null)
+        {
+            createSynth = new(synthState, dspCount);
+            createSynth.CreateDSP();
+        }
 
+        GameManager.Instance.AddSynthToList(this);
+        // OnOff.onClick.AddListener(ToggleSynth);
     }
+    
     void CheckAudioSettings()
     {
         // Verkrijg het FMOD systeem instance.
