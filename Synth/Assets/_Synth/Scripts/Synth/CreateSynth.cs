@@ -53,7 +53,7 @@ public class CreateSynth
                     synthInfo.mCaptureDSP.getActive(out bool temp);
                     synthInfo.DSPIsActive = temp; //sla het gelijk op zodat we het in andere scripts kunnen gebruiken.
                     synthInfo.channelGroup = synthChannelGroup;
-                    Debug.Log("synth is: " + synthInfo.DSPIsActive);
+                    // Debug.Log("synth is: " + synthInfo.DSPIsActive);
                     if (synthChannelGroup.addDSP(FMOD.CHANNELCONTROL_DSP_INDEX.HEAD, synthInfo.mCaptureDSP) != FMOD.RESULT.OK) //hier voegen we hem toe aan de mastergroup (hierdoor kunnen we hem horen.)
                     {
                         Debug.LogWarningFormat("FMOD: Unable to add mCaptureDSP to the master channel group");
