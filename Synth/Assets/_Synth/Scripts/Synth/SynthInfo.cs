@@ -35,7 +35,6 @@ public class SynthInfo
         {
             if (dSPIsActive != value)
             {
-                Debug.Log("Waarom werk je niet " + value);
                 dSPIsActive = value;
                 OnDSPIsActiveChanged?.Invoke(dSPIsActive);
             }
@@ -44,7 +43,6 @@ public class SynthInfo
     public FMOD.DSP_READ_CALLBACK mReadCallback;
     public FMOD.DSP mCaptureDSP;
     public FMOD.ChannelGroup channelGroup;
-    public readonly object bufferLock = new object();
     public float[] sharedBuffer;
     public GCHandle mObjHandle;
     public uint mBufferLength;
@@ -56,10 +54,6 @@ public class SynthInfo
     public SynthWaves synthWaves = new();
     public SynthInfo()
     {
-        // if (instance == null)
-        // {
-        //     instance = this;
-        // }
         SamplingFrequency = 44100;
         CurrentWaveForm = WaveForm.Sine; //sine is gwn de default
     }

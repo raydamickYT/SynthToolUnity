@@ -47,9 +47,9 @@ public class DSPCallback
                     sampleValue = obj.synthWaves.GenerateTriangleWave(sampleIndex, (uint)obj.sampleRate, obj.sineFrequency, ref obj.phase, obj.volume);
                     break;
             }
+
             for (int channel = 0; channel < outchannels; channel++)
             {
-
                 // Copy the incoming buffer to process later
                 obj.sharedBuffer[sampleIndex * outchannels + channel] = sampleValue; //bereken de juiste index in tempbuffer, waar de sample value wordt opgeslagen
                 obj.savedSampleValue = sampleValue;
