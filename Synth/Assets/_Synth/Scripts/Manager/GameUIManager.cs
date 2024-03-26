@@ -30,30 +30,32 @@ public class GameUIManager : MonoBehaviour
     {
         PopulateDropdownWithRecordDevices();
         audioRecorder = new(SynthObject);
+
         SettingsButton.onClick.AddListener(ToggleSettingsWindow);
         CloseButton.onClick.AddListener(ToggleSettingsWindow);
         RecordButtonStart.onClick.AddListener(StartRecording);
         RecordButtonStop.onClick.AddListener(StopRecording);
         SaveSettingsBtn.onClick.AddListener(SettingsSaverScript.SaveAllSynthsSettingsWithFileDialog);
         LoadSettingsBtn.onClick.AddListener(settingsLoader.OpenFileBrowser);
-        void PopulateDropdownWithRecordDevices()
-        {
-            FMOD.System system = RuntimeManager.CoreSystem;
-            system.getNumDrivers(out int numRecordDevices);
-
-            RecordingOptions.ClearOptions();
-            for (int i = 0; i < numRecordDevices; i++)
-            {
-                system.getRecordDriverInfo(i, out string name, 256, out _, out int sampleRate, out FMOD.SPEAKERMODE speakerMode, out int channels, out _);
-                string deviceInfo = $"Apparaat {i}: {name}";
-                RecordingOptions.options.Add(new Dropdown.OptionData(deviceInfo));
-            }
-
-            RecordingOptions.RefreshShownValue();
-
-            RecordingOptions.onValueChanged.AddListener(SetSelectedRecordDevice);
-        }
     }
+    void PopulateDropdownWithRecordDevices()
+    {
+        FMOD.System system = RuntimeManager.CoreSystem;
+        system.getNumDrivers(out int numRecordDevices);
+
+        RecordingOptions.ClearOptions();
+        for (int i = 0; i < numRecordDevices; i++)
+        {
+            system.getRecordDriverInfo(i, out string name, 256, out _, out int sampleRate, out FMOD.SPEAKERMODE speakerMode, out int channels, out _);
+            string deviceInfo = $"Apparaat {i}: {name}";
+            RecordingOptions.options.Add(new Dropdown.OptionData(deviceInfo));
+        }
+
+        RecordingOptions.RefreshShownValue();
+
+        RecordingOptions.onValueChanged.AddListener(SetSelectedRecordDevice);
+    }
+
     public void ToggleSettingsWindow()
     {
         // Schakelt de zichtbaarheid van het settingsPanel

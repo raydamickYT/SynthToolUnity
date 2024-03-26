@@ -63,6 +63,11 @@ public class SynthInfo
         SamplingFrequency = 44100;
         CurrentWaveForm = WaveForm.Sine; //sine is gwn de default
     }
+
+    public void ReleaseEvents()
+    {
+        OnDSPIsActiveChanged = null;
+    }
 }
 
 public class SynthWaves

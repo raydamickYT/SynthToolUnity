@@ -25,25 +25,7 @@ public class AudioRecorder
         SynthObject = _synth;
         // Initialize the FMOD system
         system = RuntimeManager.CoreSystem;
-        StoreActiveAudioOutputIndex();
     }
-
-    void StoreActiveAudioOutputIndex()
-    {
-        FMOD.RESULT result;
-        int driverIndex = 5;
-        result = system.getDriver(out driverIndex);
-        UnityEngine.Debug.Log(driverIndex);
-        if (result != FMOD.RESULT.OK)
-        {
-            UnityEngine.Debug.LogError("FMOD getDriver failed: " + result);
-            return;
-        }
-
-        // UnityEngine.Debug.Log($"Actieve audio output index: {driverIndex}");
-        // Je kunt hier de opgeslagen driverIndex gebruiken zoals nodig voor je applicatie
-    }
-
 
     // Start the recording
     public void StartRecording()
@@ -128,11 +110,9 @@ public class AudioRecorder
         }
 
         UnityEngine.Debug.Log($"Recording saved to: {path}");
-
-        // De rest van je SaveRecording logica hier...
     }
 
-    // Methode om een eenvoudige WAV-header te schrijven. Dit is vereenvoudigd en gaat ervan uit dat de audio 16-bit PCM is.
+
     private void WriteWavHeader(FileStream stream, int dataLength, int sampleRate, int numChannels, int bitsPerSample)
     {
         int blockAlign = numChannels * (bitsPerSample / 8);
@@ -142,7 +122,7 @@ public class AudioRecorder
 
         // RIFF header
         WriteBytes(header, 0, "RIFF");
-        WriteInt32(header, 4, 36 + dataLength); // Bestandsgrootte minus de eerste 8 bytes van de RIFF beschrijving
+        WriteInt32(header, 4, 36 + dataLength); // Bestandsgrootte min de eerste 8 bytes van de RIFF beschrijving
         WriteBytes(header, 8, "WAVE");
 
         // fmt subchunk
