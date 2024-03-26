@@ -122,7 +122,7 @@ public class AudioRecorder
 
         // RIFF header
         WriteBytes(header, 0, "RIFF");
-        WriteInt32(header, 4, 36 + dataLength); // Bestandsgrootte min de eerste 8 bytes van de RIFF beschrijving
+        WriteInt32(header, 4, 36 + dataLength); // Bestandsgrootte min> de eerste 8 bytes van de RIFF beschrijving
         WriteBytes(header, 8, "WAVE");
 
         // fmt subchunk
