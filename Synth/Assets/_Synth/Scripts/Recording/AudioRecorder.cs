@@ -17,12 +17,12 @@ public class AudioRecorder
     private bool isRecording = false; // Flag to check if currently recording
     private int numChannels = 2; // Aantal kanalen (stereo)
     private int bitDepth = 16; //16, 24 of 32
-    private int recordIndex;
+    Synth SynthObject;
 
-    public AudioRecorder(int _index)
+    public AudioRecorder(Synth _synth)
     {
         // Synth = _synth;
-        recordIndex = _index;
+        SynthObject = _synth;
         // Initialize the FMOD system
         system = RuntimeManager.CoreSystem;
         StoreActiveAudioOutputIndex();
@@ -65,7 +65,8 @@ public class AudioRecorder
             return;
         }
 
-        system.recordStart(recordIndex, sound, true);
+        UnityEngine.Debug.Log("Recording index: " + SynthObject.RecordIndex);
+        system.recordStart(SynthObject.RecordIndex, sound, true);
         isRecording = true;
         UnityEngine.Debug.Log("Recording started...");
     }
@@ -177,17 +178,6 @@ public class AudioRecorder
     {
         byte[] intBytes = BitConverter.GetBytes(value);
         Buffer.BlockCopy(intBytes, 0, buffer, offset, intBytes.Length);
-    }
-
-    // Andere delen van het script...
-
-    // Example function to process the recorded sound
-    void ProcessRecording()
-    {
-        // Implement processing or saving of the recording here
-        // This might involve saving to disk, applying effects, etc.
-
-        UnityEngine.Debug.Log("Processing recording...");
     }
 
     void OnDestroy()

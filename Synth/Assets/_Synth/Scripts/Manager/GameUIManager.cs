@@ -29,7 +29,7 @@ public class GameUIManager : MonoBehaviour
     private void Initialization()
     {
         PopulateDropdownWithRecordDevices();
-        audioRecorder = new(SynthObject.RecordIndex);
+        audioRecorder = new(SynthObject);
         SettingsButton.onClick.AddListener(ToggleSettingsWindow);
         CloseButton.onClick.AddListener(ToggleSettingsWindow);
         RecordButtonStart.onClick.AddListener(StartRecording);
