@@ -60,7 +60,9 @@ public class KeybindManager : MonoBehaviour
             actionButtons.AddRange(ButtonsParent.GetComponentsInChildren<Button>());
             foreach (Button button in actionButtons)
             {
-                button.onClick.AddListener(() => StartRebindingAction("Synth" + Index));
+                var currentIndex = Index;
+                Debug.Log(currentIndex);
+                button.onClick.AddListener(() => StartRebindingAction("Synth" + currentIndex));
                 Index++;
             }
             UpdateKeybindButtonTexts();
@@ -93,6 +95,7 @@ public class KeybindManager : MonoBehaviour
         if (actionToRebind != null)
         {
             waitingForKeyText.gameObject.SetActive(true);
+            Debug.Log(actionName);
             waitingForKeyText.text = "Press any key for " + actionName;
         }
     }
