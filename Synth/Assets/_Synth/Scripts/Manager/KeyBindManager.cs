@@ -52,6 +52,7 @@ public class KeybindManager : MonoBehaviour
             }
         }
     }
+    
     public void InitializeButtons()
     {
         int Index = 1;
@@ -61,7 +62,6 @@ public class KeybindManager : MonoBehaviour
             foreach (Button button in actionButtons)
             {
                 var currentIndex = Index;
-                Debug.Log(currentIndex);
                 button.onClick.AddListener(() => StartRebindingAction("Synth" + currentIndex));
                 Index++;
             }

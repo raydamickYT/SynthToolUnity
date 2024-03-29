@@ -11,13 +11,20 @@ public class GameUIManager : MonoBehaviour
     private SynthInfo SynthInfo;
     public GameObject settingsPanel; // Verwijzing naar je Settings Panel
     public Button SettingsButton, CloseButton, RecordButtonStart, RecordButtonStop;
+    public bool Isrecording = false;
     private AudioRecorder audioRecorder;
+    public Color defaultColor; // Standaardkleur
+    public Color toggledColor = Color.red; // Kleur wanneer getoggled
 
     private void Start()
     {
         if (SynthInfo == null)
         {
             SynthInfo = SynthObject.synthState;
+        }
+        if (RecordButtonStart != null)
+        {
+            defaultColor = RecordButtonStart.colors.normalColor;
         }
         settingsPanel.SetActive(false);
         Initialization();
@@ -42,10 +49,19 @@ public class GameUIManager : MonoBehaviour
     public void StartRecording()
     {
         audioRecorder.StartRecording();
+        Isrecording = true;
+        ToggleButtonColor();
     }
 
     public void StopRecording()
     {
         audioRecorder.StopRecording();
+        Isrecording = false;
+        ToggleButtonColor();
+    }
+
+    public void ToggleButtonColor()
+    {
+        RecordButtonStart.GetComponent<Image>().color = Isrecording ? toggledColor : defaultColor; // Pas de kleur aan
     }
 }

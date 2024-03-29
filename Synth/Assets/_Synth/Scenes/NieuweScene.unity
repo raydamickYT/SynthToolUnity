@@ -141,7 +141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8278567
 RectTransform:
   m_ObjectHideFlags: 0
@@ -310,7 +310,7 @@ GameObject:
   - component: {fileID: 24829448}
   - component: {fileID: 24829447}
   m_Layer: 5
-  m_Name: StopSynth
+  m_Name: StartInput
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -334,7 +334,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -18, y: -211}
-  m_SizeDelta: {x: 80, y: 30}
+  m_SizeDelta: {x: 156.24, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &24829447
 MonoBehaviour:
@@ -1064,6 +1064,9 @@ MonoBehaviour:
   CloseButton: {fileID: 1168867345}
   RecordButtonStart: {fileID: 225887908}
   RecordButtonStop: {fileID: 1310987846}
+  Isrecording: 0
+  defaultColor: {r: 0, g: 0, b: 0, a: 0}
+  toggledColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &138748083
 GameObject:
   m_ObjectHideFlags: 0
@@ -1296,7 +1299,7 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.6603774, g: 0.19001423, b: 0.19001423, a: 1}
+    m_SelectedColor: {r: 0.754717, g: 0.754717, b: 0.754717, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -4682,7 +4685,6 @@ Transform:
   m_Children:
   - {fileID: 118881099}
   - {fileID: 1971946975}
-  - {fileID: 1906769818}
   - {fileID: 1830937939}
   - {fileID: 632589900}
   - {fileID: 1076625551}
@@ -4765,6 +4767,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DisableAllSynthsButton: {fileID: 24829447}
+  defaultColor: {r: 0, g: 0, b: 0, a: 0}
+  toggledColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1 &1080821234
 GameObject:
   m_ObjectHideFlags: 0
@@ -6914,7 +6918,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Stop
+  m_Text: Start Input
 --- !u!222 &1733002244
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7454,37 +7458,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -20, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &1906769817
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1906769818}
-  m_Layer: 0
-  m_Name: SettingsSaver
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1906769818
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1906769817}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1033072333}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1915227852
 GameObject:
   m_ObjectHideFlags: 0
