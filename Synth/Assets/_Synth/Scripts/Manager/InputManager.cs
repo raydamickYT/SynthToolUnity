@@ -8,7 +8,6 @@ public class InputManager : MonoBehaviour
 {
     public Button DisableAllSynthsButton;
     private bool InputIsAllowed = false;
-    public List<SynthAction> synthActions = new List<SynthAction>();
 
     // Start is called before the first frame update
     void Start()
@@ -21,7 +20,7 @@ public class InputManager : MonoBehaviour
     {
         if (!InputIsAllowed) return;
 
-        foreach (var action in synthActions)
+        foreach (var action in KeybindManager.Instance.synthActions)
         {
             if (Input.GetKeyDown(action.Key))
             {

@@ -33,11 +33,6 @@ public class AddingSynths : MonoBehaviour
         OnAddSynth(); //voeg de eerste synth toe om alvast iets te hebbn.
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
     public void OnAddSynth()
     {
         if (SynthPrefabList.Count < 10)

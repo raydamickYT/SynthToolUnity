@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,11 +8,13 @@ public class SynthAction
 {
     public KeyCode Key;
     public int SynthIndex;
+    public String SynthName;
 
-    public SynthAction(KeyCode key, int synthIndex)
+    public SynthAction(KeyCode key, int synthIndex, string name)
     {
         Key = key;
         SynthIndex = synthIndex;
+        SynthName = name;
     }
 
     public void PerformAction(bool isKeyDown)

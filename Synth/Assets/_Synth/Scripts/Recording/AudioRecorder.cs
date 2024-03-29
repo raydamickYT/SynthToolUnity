@@ -17,12 +17,11 @@ public class AudioRecorder
     private bool isRecording = false; // Flag to check if currently recording
     private int numChannels = 2; // Aantal kanalen (stereo)
     private int bitDepth = 16; //16, 24 of 32
-    Synth SynthObject;
+    public static int RecordIndex;
 
-    public AudioRecorder(Synth _synth)
+    public AudioRecorder()
     {
         // Synth = _synth;
-        SynthObject = _synth;
         // Initialize the FMOD system
         system = RuntimeManager.CoreSystem;
     }
@@ -47,8 +46,8 @@ public class AudioRecorder
             return;
         }
 
-        UnityEngine.Debug.Log("Recording index: " + SynthObject.RecordIndex);
-        system.recordStart(SynthObject.RecordIndex, sound, true);
+        UnityEngine.Debug.Log("Recording index: " + RecordIndex);
+        system.recordStart(RecordIndex, sound, true);
         isRecording = true;
         UnityEngine.Debug.Log("Recording started...");
     }

@@ -7,13 +7,9 @@ using UnityEngine.UI;
 public class Synth : MonoBehaviour
 {
     public string Name;
-    private FMOD.ChannelGroup masterCG;
     public CreateSynth createSynth;
     public SynthInfo synthState;
     int dspCount = 0;
-    public int RecordIndex = 0;
-    public bool SynthIsPlaying = false;
-    // public Button OnOff;
 
 
     private void Awake()
@@ -34,7 +30,6 @@ public class Synth : MonoBehaviour
         }
 
         GameManager.Instance.AddSynthToList(this);
-        // OnOff.onClick.AddListener(ToggleSynth);
     }
 
     void CheckAudioSettings()
