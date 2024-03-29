@@ -54,7 +54,7 @@ public class KeybindManager : MonoBehaviour
     }
     public void InitializeButtons()
     {
-        int Index = 0;
+        int Index = 1;
         if (ButtonsParent != null)
         {
             actionButtons.AddRange(ButtonsParent.GetComponentsInChildren<Button>());
