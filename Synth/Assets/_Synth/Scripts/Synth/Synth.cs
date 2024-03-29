@@ -30,6 +30,7 @@ public class Synth : MonoBehaviour
         {
             createSynth = new(synthState, dspCount);
             createSynth.CreateDSP();
+
         }
 
         GameManager.Instance.AddSynthToList(this);

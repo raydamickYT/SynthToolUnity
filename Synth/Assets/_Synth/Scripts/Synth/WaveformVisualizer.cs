@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(LineRenderer))]
 public class WaveformVisualizer : MonoBehaviour
@@ -8,6 +9,7 @@ public class WaveformVisualizer : MonoBehaviour
     private LineRenderer lineRenderer;
     public float scale = 1;
     public Vector3 Offset;
+    public Vector2 Size = new Vector2(887, 270); //scroll view height
 
     void Start()
     {
@@ -28,6 +30,7 @@ public class WaveformVisualizer : MonoBehaviour
 
     void VisualizeWaveform()
     {
+
         float[] synthDataBuffer = mySynth.GetCurrentAudioBuffer(); // Implementeer deze methode in je Synth klasse
         int samples = synthDataBuffer.Length;
 
@@ -38,7 +41,7 @@ public class WaveformVisualizer : MonoBehaviour
         for (int i = 0; i < samples; i++)
         {
             float x = i * (1.0f / samples) * scale + Offset.x;
-            float y = synthDataBuffer[i] + Offset.y; // 'scale' is jouw schaalverdeling voor y
+            float y = synthDataBuffer[i] + Offset.y;
             points[i] = new Vector3(x, y, Offset.z);
         }
         lineRenderer.SetPositions(points);

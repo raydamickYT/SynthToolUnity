@@ -49,7 +49,8 @@ public class CreateSynth
             {
                 if (FMODUnity.RuntimeManager.CoreSystem.createDSP(ref desc, out synthInfo.mCaptureDSP) == FMOD.RESULT.OK) //hier wordt de dsp aangemaakt
                 {
-                    synthInfo.mCaptureDSP.setActive(true); //zet hem tijdelijk op inactief, dan kunnen we dat later aanpassen.
+                    synthInfo.mCaptureDSP.setActive(false); //zet hem tijdelijk op inactief, dan kunnen we dat later aanpassen. (dit werkt dus niet om een of andere reden)
+
                     synthInfo.mCaptureDSP.getActive(out bool temp);
                     synthInfo.DSPIsActive = temp; //sla het gelijk op zodat we het in andere scripts kunnen gebruiken.
                     synthInfo.channelGroup = synthChannelGroup;
@@ -79,27 +80,4 @@ public class CreateSynth
             Debug.LogWarningFormat("FMOD: Unable to create a GCHandle: mObjHandle");
         }
     }
-
-    public void InitializeDSPForSynth(SynthInfo synthInfo)
-    {
-        FMOD.DSP_DESCRIPTION dspDescription = new FMOD.DSP_DESCRIPTION();
-        // Configureer de dspDescription zoals nodig, inclusief het instellen van de read callback
-        dspDescription.read = synthInfo.mReadCallback;
-
-        FMOD.DSP dsp;
-        FMODUnity.RuntimeManager.CoreSystem.createDSP(ref dspDescription, out dsp);
-
-        // Stel DSP eigenschappen in
-        dsp.setActive(false);  // Start standaard als niet-actief
-
-        // Sla de DSP op in SynthInfo voor latere referentie
-        synthInfo.mCaptureDSP = dsp;
-
-        // Voeg DSP toe aan de Master Channel Group
-        FMOD.ChannelGroup masterGroup;
-        FMODUnity.RuntimeManager.CoreSystem.getMasterChannelGroup(out masterGroup);
-        masterGroup.addDSP(FMOD.CHANNELCONTROL_DSP_INDEX.HEAD, dsp);
-    }
-
-
 }

@@ -10,6 +10,7 @@ public class UIManager : MonoBehaviour
     public Button OnOffBtn;
     public Dropdown ChangeWave, dropdown;
     public Slider FrequencySlider, VolumeSlider;
+    public Text VolumeText, FrequencyText;
 
     private void Start()
     {
@@ -20,16 +21,31 @@ public class UIManager : MonoBehaviour
         }
         Initialization();
     }
+
     private void Initialization()
     {
-        SynthInfo.OnDSPIsActiveChanged += DSPIsActiveChanged;
+        // SynthInfo.OnDSPIsActiveChanged += DSPIsActiveChanged;
         // SynthInfo.mCaptureDSP.getActive(out SynthObject.synthState.DSPIsActive);
+        if (FrequencySlider != null)
+        {
+            FrequencySlider.value = SynthInfo.sineFrequency;
+            FrequencySlider.onValueChanged.AddListener(ChangeFreq);
+            if (FrequencyText != null)
+            {
+                FrequencyText.text = "Frequency: " + SynthInfo.sineFrequency;
+            }
+        }
 
-        FrequencySlider.value = SynthInfo.sineFrequency;
-        FrequencySlider.onValueChanged.AddListener(ChangeFreq);
+        if (VolumeSlider != null)
+        {
+            VolumeSlider.value = SynthInfo.volume;
+            VolumeSlider.onValueChanged.AddListener(ChageVol);
+            if (VolumeText != null)
+            {
+                VolumeText.text = "Volume: " + SynthInfo.volume * 100; //x 100 omdat het anders een komma getal is
+            }
+        }
 
-        VolumeSlider.value = SynthInfo.volume;
-        VolumeSlider.onValueChanged.AddListener(ChageVol);
 
         ChangeWave.onValueChanged.AddListener(delegate
         {
@@ -37,6 +53,9 @@ public class UIManager : MonoBehaviour
         });
 
         OnOffBtn.onClick.AddListener(ToggleSynth);
+
+        ToggleSynth(); //WARNING: Dit staat er alleen in omdat ik niet meer kan vinden waar ik de synth aan zet. 
+
         FMODUnity.RuntimeManager.CoreSystem.getNumDrivers(out int test);
         for (int i = 0; i < test; i++)
         {
@@ -44,29 +63,11 @@ public class UIManager : MonoBehaviour
             // UnityEngine.Debug.Log($"Apparaat {i}: {name}, SampleRate: {sampleRate}, SpeakerMode: {speakerMode}, Channels: {channels}");
         }
     }
-    private void DSPIsActiveChanged(bool isActive)
-    {
-        Debug.Log("we zitten hier");
-        OnDSPActiveChanged(isActive);
-    }
     public void ToggleSynth()
     {
         SynthInfo.DSPIsActive = !SynthInfo.DSPIsActive;
 
         switch (SynthInfo.DSPIsActive)
-        {
-            case true:
-                StopSynth();
-                break;
-            case false:
-                StartSynth();
-                break;
-            default:
-        }
-    }
-    public void OnDSPActiveChanged(bool active)
-    {
-        switch (active)
         {
             case true:
                 StopSynth();
@@ -115,20 +116,23 @@ public class UIManager : MonoBehaviour
 
     }
 
-    private void ChangeFreq(float vol)
+    private void ChangeFreq(float Freq)
     {
-        SynthInfo.sineFrequency = vol;
+        SynthInfo.sineFrequency = Freq;
+        FrequencyText.text = "Frequency: " + Freq;
     }
 
     private void ChageVol(float vol)
     {
         SynthInfo.volume = vol;
+        VolumeText.text = "Volume: " + vol * 100;
+
     }
     private void OnDestroy()
     {
         if (SynthInfo != null)
         {
-            SynthInfo.OnDSPIsActiveChanged -= DSPIsActiveChanged;
+            // SynthInfo.OnDSPIsActiveChanged -= DSPIsActiveChanged;
         }
     }
 }
