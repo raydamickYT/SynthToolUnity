@@ -112,6 +112,4 @@ public class SettingsLoader
             Debug.LogError($"Error loading settings: {e.Message}");
         }
     }
-
-
 }
