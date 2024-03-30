@@ -3313,9 +3313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fa0f6e617c66d540887fe7388d6ca5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Name: 1
-  RecordIndex: 0
-  SynthIsPlaying: 0
+  Name: 0
 --- !u!1 &8493676438362658398
 GameObject:
   m_ObjectHideFlags: 0

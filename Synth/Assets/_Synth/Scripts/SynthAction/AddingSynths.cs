@@ -7,6 +7,7 @@ using Button = UnityEngine.UI.Button;
 
 public class AddingSynths : MonoBehaviour
 {
+    public static AddingSynths Instance;
     public GameObject SynthPrefab, SynthParent;
     public List<GameObject> SynthPrefabList = new();
     public Button AddSynth, RemoveSynth;
@@ -21,6 +22,10 @@ public class AddingSynths : MonoBehaviour
         if (RemoveSynth != null)
         {
             RemoveSynth.onClick.AddListener(OnRemoveSynth);
+        }
+        if (Instance == null)
+        {
+            Instance = this;
         }
     }
     void Start()
@@ -48,6 +53,27 @@ public class AddingSynths : MonoBehaviour
             UpdateScrollViewHeight();
         }
     }
+    public Synth AddExtraSynths()
+    {
+        if (SynthPrefabList.Count < 10)
+        {
+            //voeg hier een synth toe aan de array
+            GameObject tempPrefab = Instantiate(SynthPrefab);
+            tempPrefab.transform.SetParent(SynthParent.transform);
+            tempPrefab.transform.localScale = SynthPrefab.transform.localScale; //dit is nodig omdat anders de synth gigantisch wordt
+            Vector3 newPosition = SynthParent.transform.position + SynthInitOffSet + new Vector3(0, SynthSpawnOffSet.y * SynthPrefabList.Count, 0);
+
+            tempPrefab.transform.position = newPosition;
+            SynthPrefabList.Add(tempPrefab);
+            UpdateScrollViewHeight();
+            var test = SynthPrefab.GetComponentInChildren<Synth>();
+            return test;
+        }
+        else
+        {
+            return null;
+        }
+    }
 
     public void OnRemoveSynth()
     {
@@ -62,10 +88,7 @@ public class AddingSynths : MonoBehaviour
             {
                 GameObject.Destroy(lastElement);
             }
-            // if (SynthPrefabList.Count > 0)
-            // {
-            //     SynthSpawnOffSet.y += 2;
-            // }
+
         }
     }
     public void UpdateScrollViewHeight()

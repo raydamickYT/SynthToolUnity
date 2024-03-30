@@ -75,8 +75,11 @@ public class Synth : MonoBehaviour
     void OnDestroy()
     {
         //release alles
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RemoveSynthFromList(this);
+        }
         synthState.ReleaseEvents();
-
         if (synthState.mObjHandle != null)
         {
             if (synthState.mCaptureDSP.hasHandle())

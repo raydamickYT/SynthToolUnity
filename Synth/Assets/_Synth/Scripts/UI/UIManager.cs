@@ -17,6 +17,7 @@ public class UIManager : MonoBehaviour
         if (SynthInfo == null && SynthObject != null)
         {
             SynthInfo = SynthObject.synthState;
+            SynthInfo.uIManager = this;
             // Debug.LogError("Synth niet assigned in: " + gameObject.name);
         }
         Initialization();
@@ -116,13 +117,14 @@ public class UIManager : MonoBehaviour
 
     }
 
-    private void ChangeFreq(float Freq)
+    public void ChangeFreq(float Freq)
     {
+        Debug.Log(Freq + "Synthname: "+SynthInfo.name);
         SynthInfo.sineFrequency = Freq;
         FrequencyText.text = "Frequency: " + Freq;
     }
 
-    private void ChageVol(float vol)
+    public void ChageVol(float vol)
     {
         SynthInfo.volume = vol;
         VolumeText.text = "Volume: " + vol * 100;

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using SFB;
+using Unity.VisualScripting;
 
 public class SettingsLoader
 {
@@ -35,11 +36,22 @@ public class SettingsLoader
                     // Extract synth name from the section
                     string synthName = line.Trim('[', ']');
                     // Find the corresponding Synth based on its name
-                    var synth = GameManager.Instance.synths.FirstOrDefault(s => s.name == synthName);
-                    if (synth != null)
+                    Synth synth = GameManager.Instance.synths.FirstOrDefault(s => s.name == synthName);
+                    if (synth == null)
                     {
-                        currentSynthState = synth.synthState;
+                        // Als de synth niet bestaat, maak dan een nieuwe aan.
+                        Debug.Log("Pipo");
+                        if (AddingSynths.Instance != null)
+                        {
+                            synth = AddingSynths.Instance.AddExtraSynths(); // Zorg dat OnAddSynth de synthnaam accepteert en een nieuwe Synth retourneert
+                        }
+                        Debug.Log($"Nieuwe synth toegevoegd: {synthName}");
                     }
+                    else
+                    {
+                        Debug.Log($"Synth gevonden: {synthName}");
+                    }
+                    currentSynthState = synth.synthState;
                 }
                 else if (currentSynthState != null && line.Contains(":"))
                 {
@@ -53,7 +65,8 @@ public class SettingsLoader
                     switch (key)
                     {
                         case "Frequency":
-                            currentSynthState.sineFrequency = float.Parse(value);
+                            // currentSynthState.sineFrequency = float.Parse(value);
+                            currentSynthState.uIManager.ChangeFreq(float.Parse(value));
                             break;
                         case "SamplingFrequency":
                             currentSynthState.SamplingFrequency = uint.Parse(value);
@@ -62,14 +75,15 @@ public class SettingsLoader
                             currentSynthState.CarrierPhase = float.Parse(value);
                             break;
                         case "Volume":
-                            currentSynthState.volume = float.Parse(value);
+                            // currentSynthState.volume = float.Parse(value);
+                            currentSynthState.uIManager.ChageVol(float.Parse(value));
                             break;
                         case "Enabled":
                             if (bool.TryParse(value, out bool result))
                             {
-                                Debug.Log(currentSynthState.DSPIsActive);
+                                // Debug.Log(currentSynthState.DSPIsActive);
                                 currentSynthState.DSPIsActive = result;
-                                Debug.Log(currentSynthState.DSPIsActive);
+                                // Debug.Log(currentSynthState.DSPIsActive);
                             }
                             else
                             {
@@ -88,9 +102,9 @@ public class SettingsLoader
                             Debug.LogWarning($"Unknown setting '{key}'");
                             break;
                     }
+                    // currentSynthState = null;
                 }
             }
-
             Debug.Log("Settings loaded successfully for all synths.");
         }
         catch (Exception e)

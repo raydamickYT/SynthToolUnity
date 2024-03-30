@@ -5,6 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     private static GameManager instance;
+    private int Index = 0;
     public static GameManager Instance
     {
         get
@@ -34,5 +35,12 @@ public class GameManager : MonoBehaviour
     public void AddSynthToList(Synth synth)
     {
         synths.Add(synth);
+        synth.name = "Synth: " + Index.ToString();
+        Index++;
+    }
+    public void RemoveSynthFromList(Synth synth)
+    {
+        synths.Remove(synth);
+        Index--;
     }
 }

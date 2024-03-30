@@ -41,7 +41,6 @@ public class SettingsSaver
             allSettings.Add("Enabled: " + _state.DSPIsActive);
             allSettings.Add(""); // Voeg een lege regel toe als scheiding tussen de instellingen van verschillende synths
         }
-
         return allSettings;
     }
 

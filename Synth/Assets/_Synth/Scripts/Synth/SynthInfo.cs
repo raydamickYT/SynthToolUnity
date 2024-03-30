@@ -17,6 +17,7 @@ public enum WaveForm
 public class SynthInfo
 {
     // public static SynthInfo instance;
+    public UIManager uIManager;
     public string name;
     public uint SamplingFrequency;
     public float CarrierPhase;

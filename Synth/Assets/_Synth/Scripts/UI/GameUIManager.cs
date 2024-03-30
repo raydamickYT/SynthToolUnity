@@ -7,8 +7,7 @@ using UnityEngine.UI;
 
 public class GameUIManager : MonoBehaviour
 {
-    public Synth SynthObject;
-    private SynthInfo SynthInfo;
+
     public GameObject settingsPanel; // Verwijzing naar je Settings Panel
     public Button SettingsButton, CloseButton, RecordButtonStart, RecordButtonStop;
     public bool Isrecording = false;
@@ -18,10 +17,7 @@ public class GameUIManager : MonoBehaviour
 
     private void Start()
     {
-        if (SynthInfo == null)
-        {
-            SynthInfo = SynthObject.synthState;
-        }
+
         if (RecordButtonStart != null)
         {
             defaultColor = RecordButtonStart.colors.normalColor;
