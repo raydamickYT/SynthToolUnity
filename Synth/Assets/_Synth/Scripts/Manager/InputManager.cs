@@ -25,7 +25,7 @@ public class InputManager : MonoBehaviour
     {
         if (!InputIsAllowed) return;
 
-        foreach (var action in KeybindManager.Instance.synthActions)
+        foreach (var action in KeybindManager.Instance.keyData.synthActions)
         {
             if (Input.GetKeyDown(action.Key))
             {
