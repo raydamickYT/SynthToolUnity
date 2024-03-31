@@ -9,7 +9,7 @@ public class InputManager : MonoBehaviour
     public Button DisableAllSynthsButton;
     public Color defaultColor; // Standaardkleur
     public Color toggledColor = Color.green; // Kleur wanneer getoggled
-
+    public bool ToggleBool = false;
 
     private bool InputIsAllowed = false;
 
@@ -42,9 +42,11 @@ public class InputManager : MonoBehaviour
         InputIsAllowed = !InputIsAllowed;
         foreach (var Synth in GameManager.Instance.synths)
         {
-            Synth.synthState.mCaptureDSP.getActive(out bool IsActive);
-            UnityEngine.Debug.Log(IsActive);
-            if (!IsActive) Synth.synthState.mCaptureDSP.setActive(InputIsAllowed); //we moeten er wel voor zorgen dat de synth altijd aanstaat als ze input willen.
+            // Synth.synthState.mCaptureDSP.getActive(out bool IsActive); //dit was om te checken of de synth actief is, maar het werkte niet
+            
+            if (InputIsAllowed) Synth.synthState.mCaptureDSP.setActive(InputIsAllowed);
+            else if(!InputIsAllowed) Synth.synthState.mCaptureDSP.setActive(InputIsAllowed);
+             //we moeten er wel voor zorgen dat de synth altijd aanstaat als ze input willen.
             Synth.synthState.mCaptureDSP.setBypass(InputIsAllowed);
         }
         UnityEngine.Debug.Log("All Synths bypassed");
