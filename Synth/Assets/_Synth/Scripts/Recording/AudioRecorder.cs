@@ -6,7 +6,8 @@ using SFB;
 using System.IO;
 using System.Runtime.InteropServices;
 using FMODUnityResonance;
-using System.Collections.Generic; // standalone file browser
+using System.Collections.Generic;
+using UnityEngine.UI; // standalone file browser
 
 public class AudioRecorder
 {
@@ -18,12 +19,35 @@ public class AudioRecorder
     private int numChannels = 2; // Aantal kanalen (stereo)
     private int bitDepth = 16; //16, 24 of 32
     public static int RecordIndex;
+    public int RecordingLenghtInt = 10;
 
     public AudioRecorder()
     {
         // Synth = _synth;
         // Initialize the FMOD system
         system = RuntimeManager.CoreSystem;
+    }
+
+    public void ChangeRecordingLenght(int Index)
+    {
+        UnityEngine.Debug.Log(Index);
+        switch (Index)
+        {
+            case 0:
+                RecordingLenghtInt = 10;
+                break;
+            case 1:
+                RecordingLenghtInt = 20;
+                break;
+            case 2:
+                RecordingLenghtInt = 30;
+                break;
+            case 3:
+                RecordingLenghtInt = 60;
+                break;
+            default:
+                break;
+        }
     }
 
     // Start the recording
@@ -34,9 +58,9 @@ public class AudioRecorder
         {
             cbsize = Marshal.SizeOf(typeof(FMOD.CREATESOUNDEXINFO)),
             numchannels = 2, // Stereo
-            defaultfrequency = 48000, // 44100 Hz
+            defaultfrequency = 44100, // 44100 Hz
             format = FMOD.SOUND_FORMAT.PCM16, // 16-bit PCM audio
-            length = (uint)(10 * sampleRate * numChannels * sizeof(short)) // Voor 10 seconden opname
+            length = (uint)(RecordingLenghtInt * sampleRate * numChannels * sizeof(short)) // Voor 10 seconden opname
         };
 
         FMOD.RESULT result = system.createSound((String)null, FMOD.MODE.CREATESAMPLE | FMOD.MODE.LOOP_OFF | FMOD.MODE.OPENUSER, ref soundExInfo, out sound);
@@ -164,4 +188,11 @@ public class AudioRecorder
         // Clean up
         sound.release();
     }
+}
+public enum RecordingLength
+{
+    TenSeconds,
+    TwentySeconds,
+    ThirtySeconds,
+    OneMinute
 }

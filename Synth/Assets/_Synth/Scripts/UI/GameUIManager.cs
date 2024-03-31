@@ -7,13 +7,13 @@ using UnityEngine.UI;
 
 public class GameUIManager : MonoBehaviour
 {
-
     public GameObject settingsPanel; // Verwijzing naar je Settings Panel
     public Button SettingsButton, CloseButton, RecordButtonStart, RecordButtonStop;
     public bool Isrecording = false;
     private AudioRecorder audioRecorder;
     public Color defaultColor; // Standaardkleur
     public Color toggledColor = Color.red; // Kleur wanneer getoggled
+    public Dropdown RecordingLengthDropDown;
 
     private void Start()
     {
@@ -34,6 +34,8 @@ public class GameUIManager : MonoBehaviour
         CloseButton.onClick.AddListener(ToggleSettingsWindow);
         RecordButtonStart.onClick.AddListener(StartRecording);
         RecordButtonStop.onClick.AddListener(StopRecording);
+
+        RecordingLengthDropDown.onValueChanged.AddListener(audioRecorder.ChangeRecordingLenght);
     }
 
     public void ToggleSettingsWindow()
