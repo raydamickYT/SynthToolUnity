@@ -15,7 +15,6 @@ public class SavePlayerPrefs
     public void SaveKeybindsToFile()
     {
         string path = Path.Combine(Application.persistentDataPath, "keybinds.json");
-        // Veronderstelt dat keybindManager een representatie heeft die door JsonUtility kan worden geserialiseerd
         string json = JsonUtility.ToJson(keybindManager, true);
         File.WriteAllText(path, json);
     }

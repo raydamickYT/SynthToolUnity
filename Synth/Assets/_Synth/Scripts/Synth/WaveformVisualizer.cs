@@ -5,11 +5,15 @@ using UnityEngine.UIElements;
 public class WaveformVisualizer : MonoBehaviour
 {
     public Material LineMat;
-    public Synth mySynth; // Verwijs naar je Synth component
+    public Synth mySynth;
     private LineRenderer lineRenderer;
     public float scale = 1;
     public Vector3 Offset;
     public Vector2 Size = new Vector2(887, 270); //scroll view height
+
+    /// <summary>
+    /// IMPORTANT: door problemen met de waveform in de scrollview heb ik deze class niet meer gebruikt. Ik laat hem er in zitten omdat het nog van pas kan komen
+    /// </summary>
 
     void Start()
     {
@@ -31,13 +35,12 @@ public class WaveformVisualizer : MonoBehaviour
     void VisualizeWaveform()
     {
 
-        float[] synthDataBuffer = mySynth.GetCurrentAudioBuffer(); // Implementeer deze methode in je Synth klasse
+        float[] synthDataBuffer = mySynth.GetCurrentAudioBuffer();
         int samples = synthDataBuffer.Length;
 
         lineRenderer.positionCount = samples;
         Vector3[] points = new Vector3[samples];
 
-        // Vector3 offset = new Vector3(-4, 3, 0); // Beginpositie voor de waveform
         for (int i = 0; i < samples; i++)
         {
             float x = i * (1.0f / samples) * scale + Offset.x;

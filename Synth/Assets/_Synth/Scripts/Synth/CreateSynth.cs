@@ -15,19 +15,14 @@ public class CreateSynth
 
     public void CreateDSP()
     {
-        // Assign the callback to a member variable to avoid garbage collection
         synthInfo.mReadCallback = DSPCallback.CaptureDSPReadCallback;
 
 
-        // Allocate a data buffer large enough for 8 channels
         uint bufferLength;
         int numBuffers;
         FMODUnity.RuntimeManager.CoreSystem.getDSPBufferSize(out bufferLength, out numBuffers);
         synthInfo.mDataBuffer = new float[bufferLength * 8];
         synthInfo.mBufferLength = bufferLength;
-
-        // Get a handle to this object to pass into the callback
-        // SynthState synthState = new(sineFrequency, (uint)sampleRate, mDataBuffer);
 
         synthInfo.mObjHandle = GCHandle.Alloc(synthInfo);
         if (synthInfo.mObjHandle != null)
@@ -54,7 +49,6 @@ public class CreateSynth
                     synthInfo.mCaptureDSP.getActive(out bool temp);
                     synthInfo.DSPIsActive = temp; //sla het gelijk op zodat we het in andere scripts kunnen gebruiken.
                     synthInfo.channelGroup = synthChannelGroup;
-                    // Debug.Log("synth is: " + synthInfo.DSPIsActive);
                     if (synthChannelGroup.addDSP(FMOD.CHANNELCONTROL_DSP_INDEX.HEAD, synthInfo.mCaptureDSP) != FMOD.RESULT.OK) //hier voegen we hem toe aan de mastergroup (hierdoor kunnen we hem horen.)
                     {
                         Debug.LogWarningFormat("FMOD: Unable to add mCaptureDSP to the master channel group");
@@ -62,7 +56,6 @@ public class CreateSynth
                     else
                     {
                         synthChannelGroup.getNumChannels(out int channels);
-                        // Debug.Log(channels);
                     }
                 }
                 else

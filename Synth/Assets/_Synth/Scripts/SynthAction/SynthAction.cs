@@ -8,7 +8,7 @@ public class SynthAction
 {
     public KeyCode Key;
     public int SynthIndex;
-    public String SynthName;
+    public string SynthName;
 
     public SynthAction(KeyCode key, int synthIndex, string name)
     {

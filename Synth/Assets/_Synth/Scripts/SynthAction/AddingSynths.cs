@@ -100,7 +100,6 @@ public class AddingSynths : MonoBehaviour
         // Bereken de totale hoogte die nodig is voor alle items plus marges
         float totalHeight = SynthPrefabList.Count * (itemHeight + margin);
 
-        // Update de sizeDelta van de RectTransform van de content om de nieuwe hoogte te reflecteren
         scrollView.sizeDelta = new Vector2(scrollView.sizeDelta.x, totalHeight);
     }
 

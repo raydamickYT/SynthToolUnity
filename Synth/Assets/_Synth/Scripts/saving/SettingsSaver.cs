@@ -6,7 +6,6 @@ using SFB;
 
 public class SettingsSaver
 {
-    // Methode om de instellingen op te slaan
     private void SaveSettings(string filePath, string[] settings)
     {
         try
@@ -24,7 +23,6 @@ public class SettingsSaver
         }
     }
 
-    // Voorbeeldgebruik: Roep deze methode aan wanneer je de instellingen wilt opslaan
     private List<string> GetAllSynthsSettings()
     {
         List<string> allSettings = new List<string>();
@@ -32,7 +30,7 @@ public class SettingsSaver
         foreach (Synth synth in GameManager.Instance.synths)
         {
             // Haal de SynthInfo van de huidige synth
-            SynthInfo _state = synth.synthState; // Zorg ervoor dat je een methode in Synth hebt die SynthInfo retourneert
+            SynthInfo _state = synth.synthState; 
             allSettings.Add("[" + synth.name + "]");
             allSettings.Add("SamplingFrequency: " + _state.SamplingFrequency);
             allSettings.Add("currentWaveForm: " + _state.CurrentWaveForm.ToString());
@@ -52,13 +50,11 @@ public class SettingsSaver
         new ExtensionFilter("All Files", "*"),
     };
 
-        // StandaloneFileBrowser.SaveFilePanel retourneert direct het pad als een string
         string filePath = StandaloneFileBrowser.SaveFilePanel("Save Settings", "", "synthSettings", extensions);
 
         // Controleer of de gebruiker een pad heeft gekozen
         if (!string.IsNullOrEmpty(filePath))
         {
-            // Sla de instellingen op met het gekozen bestandspad
             SaveSettings(filePath, GetAllSynthsSettings().ToArray());
         }
     }

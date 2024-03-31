@@ -18,15 +18,12 @@ public class UIManager : MonoBehaviour
         {
             SynthInfo = SynthObject.synthState;
             SynthInfo.uIManager = this;
-            // Debug.LogError("Synth niet assigned in: " + gameObject.name);
         }
         Initialization();
     }
 
     private void Initialization()
     {
-        // SynthInfo.OnDSPIsActiveChanged += DSPIsActiveChanged;
-        // SynthInfo.mCaptureDSP.getActive(out SynthObject.synthState.DSPIsActive);
         if (FrequencySlider != null)
         {
             FrequencySlider.value = SynthInfo.sineFrequency;
@@ -61,7 +58,6 @@ public class UIManager : MonoBehaviour
         for (int i = 0; i < test; i++)
         {
             RuntimeManager.CoreSystem.getRecordDriverInfo(i, out string name, 256, out _, out int sampleRate, out FMOD.SPEAKERMODE speakerMode, out int channels, out _);
-            // UnityEngine.Debug.Log($"Apparaat {i}: {name}, SampleRate: {sampleRate}, SpeakerMode: {speakerMode}, Channels: {channels}");
         }
     }
     public void ToggleSynth()
@@ -119,16 +115,17 @@ public class UIManager : MonoBehaviour
 
     public void ChangeFreq(float Freq)
     {
-        Debug.Log(Freq + "Synthname: "+SynthInfo.name);
+        Debug.Log(Freq + "Synthname: " + SynthInfo.name);
         SynthInfo.sineFrequency = Freq;
         FrequencyText.text = "Frequency: " + Freq;
+        FrequencySlider.value = Freq;
     }
 
     public void ChageVol(float vol)
     {
         SynthInfo.volume = vol;
         VolumeText.text = "Volume: " + vol * 100;
-
+        VolumeSlider.value = vol;
     }
     private void OnDestroy()
     {

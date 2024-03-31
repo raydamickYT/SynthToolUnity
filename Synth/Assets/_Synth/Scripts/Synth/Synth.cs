@@ -34,8 +34,8 @@ public class Synth : MonoBehaviour
 
     void CheckAudioSettings()
     {
-        // Verkrijg het FMOD systeem instance.
-        FMOD.System system = RuntimeManager.CoreSystem; // Verkrijg het FMOD systeem
+        // krijg het FMOD systeem instance.
+        FMOD.System system = RuntimeManager.CoreSystem; // krijg het FMOD systeem
         FMOD.SPEAKERMODE speakerMode;
         int raw;
 
@@ -59,15 +59,12 @@ public class Synth : MonoBehaviour
         for (int i = 0; masterGroup.getDSP(i, out dspNode) == FMOD.RESULT.OK; i++)
         {
             dspCount++;
-            // dspNode.release(); // Zorg ervoor dat je de DSP vrijgeeft om memory leaks te voorkomen.
         }
         Debug.Log($"Aantal actieve DSP's: {dspCount}");
 
     }
     public float[] GetCurrentAudioBuffer()
     {
-        // Retourneer hier de recente audio buffer data
-        // Dit hangt af van hoe je audio data genereert of opslaat in je synth
         return synthState.sharedBuffer;
     }
 

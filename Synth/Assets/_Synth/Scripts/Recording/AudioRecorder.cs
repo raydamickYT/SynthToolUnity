@@ -11,7 +11,6 @@ using UnityEngine.UI; // standalone file browser
 
 public class AudioRecorder
 {
-    // Synth Synth;
     private int sampleRate = 44100; // Standaard sample rate
     private FMOD.System system; // FMOD low-level system instance
     private FMOD.Sound sound; // Sound object to hold the recording
@@ -23,7 +22,6 @@ public class AudioRecorder
 
     public AudioRecorder()
     {
-        // Synth = _synth;
         // Initialize the FMOD system
         system = RuntimeManager.CoreSystem;
     }
@@ -60,7 +58,7 @@ public class AudioRecorder
             numchannels = 2, // Stereo
             defaultfrequency = 44100, // 44100 Hz
             format = FMOD.SOUND_FORMAT.PCM16, // 16-bit PCM audio
-            length = (uint)(RecordingLenghtInt * sampleRate * numChannels * sizeof(short)) // Voor 10 seconden opname
+            length = (uint)(RecordingLenghtInt * sampleRate * numChannels * sizeof(short)) // Voor 10 seconden opname (default)
         };
 
         FMOD.RESULT result = system.createSound((String)null, FMOD.MODE.CREATESAMPLE | FMOD.MODE.LOOP_OFF | FMOD.MODE.OPENUSER, ref soundExInfo, out sound);
@@ -78,7 +76,7 @@ public class AudioRecorder
 
     public void StopRecording()
     {
-        if (!isRecording) return; // Check if not currently recording
+        if (!isRecording) return; 
 
         system.recordStop(0);
         isRecording = false;
@@ -181,12 +179,6 @@ public class AudioRecorder
     {
         byte[] intBytes = BitConverter.GetBytes(value);
         Buffer.BlockCopy(intBytes, 0, buffer, offset, intBytes.Length);
-    }
-
-    void OnDestroy()
-    {
-        // Clean up
-        sound.release();
     }
 }
 public enum RecordingLength

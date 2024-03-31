@@ -8,7 +8,7 @@ public class SettingsUI : MonoBehaviour
 {
     public SettingsSaver SettingsSaverScript = new();
     public SettingsLoader settingsLoader = new();
-    public GameObject KeybindsPanel, SettingsPanel; // Verwijzing naar je Settings Panel
+    public GameObject KeybindsPanel, SettingsPanel;
     public Button SaveSettingsBtn, LoadSettingsBtn, KeyBindsBtn, CloseKeybindsBtn;
     public Dropdown RecordingOptions;
 
@@ -46,7 +46,6 @@ public class SettingsUI : MonoBehaviour
     }
     public void SetSelectedRecordDevice(int selectedIndex)
     {
-        // FMODUnity.RuntimeManager.CoreSystem.setRecordDriver(selectedIndex);
         AudioRecorder.RecordIndex = selectedIndex;
         Debug.Log($"Geselecteerd opnameapparaat: {RecordingOptions.options[selectedIndex].text}");
     }

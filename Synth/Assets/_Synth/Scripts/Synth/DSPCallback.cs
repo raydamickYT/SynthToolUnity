@@ -21,6 +21,7 @@ public class DSPCallback
 
         //-------------------------
         //geluid
+        
         // Pas de gain toe op elke sample
         obj.sharedBuffer = new float[length * obj.mChannels];
 

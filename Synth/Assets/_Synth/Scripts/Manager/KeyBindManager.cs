@@ -8,11 +8,10 @@ public class KeybindManager : MonoBehaviour
 {
     public static KeybindManager Instance;
     public KeyData keyData = new();
-
-    public List<Button> actionButtons; // Een lijst met alle UI knoppen
+    public List<Button> actionButtons; 
     public GameObject ButtonsParent;
-    public Text waitingForKeyText; // Een tekst UI element dat aangeeft dat het systeem wacht op een key press
-    private SynthAction actionToRebind = null; // Houdt bij welke actie opnieuw gebonden wordt
+    public Text waitingForKeyText; 
+    private SynthAction actionToRebind = null; 
     public Button ApplyBtn, ResetBtn;
 
     private void Awake()
@@ -75,11 +74,9 @@ public class KeybindManager : MonoBehaviour
         int Index = 0;
         foreach (var action in keyData.synthActions)
         {
-            // Vind de bijbehorende knop
             Button button = actionButtons[Index];
             if (button != null)
             {
-                // Update de tekst van de knop
                 Text buttonText = button.GetComponentInChildren<Text>();
                 if (buttonText != null)
                 {
@@ -90,7 +87,6 @@ public class KeybindManager : MonoBehaviour
         }
     }
 
-    // Een methode aangeroepen door UI knoppen om het proces van het herbinden van een key te starten
     public void StartRebindingAction(string actionName)
     {
         actionToRebind = keyData.synthActions.Find(action => action.SynthName == actionName);

@@ -12,14 +12,14 @@ public class GameManager : MonoBehaviour
         {
             if (instance == null)
             {
-                instance = FindObjectOfType<GameManager>();
+                instance = FindObjectOfType<GameManager>(); // dit wordt alleen gecalled als een object de gamemanager eerder called dan hij wordt aangemaakt.
             }
             return instance;
         }
     }
-
     public List<Synth> synths;
-    // Start is called before the first frame update
+
+
     void Awake()
     {
         if (instance == null)

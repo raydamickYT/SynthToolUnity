@@ -65,7 +65,6 @@ public class SettingsLoader
                     switch (key)
                     {
                         case "Frequency":
-                            // currentSynthState.sineFrequency = float.Parse(value);
                             currentSynthState.uIManager.ChangeFreq(float.Parse(value));
                             break;
                         case "SamplingFrequency":
@@ -81,9 +80,7 @@ public class SettingsLoader
                         case "Enabled":
                             if (bool.TryParse(value, out bool result))
                             {
-                                // Debug.Log(currentSynthState.DSPIsActive);
                                 currentSynthState.DSPIsActive = result;
-                                // Debug.Log(currentSynthState.DSPIsActive);
                             }
                             else
                             {
@@ -97,12 +94,10 @@ public class SettingsLoader
                                 currentSynthState.CurrentWaveForm = waveFormResult;
                             }
                             break;
-                        // Add more cases as needed
                         default:
                             Debug.LogWarning($"Unknown setting '{key}'");
                             break;
                     }
-                    // currentSynthState = null;
                 }
             }
             Debug.Log("Settings loaded successfully for all synths.");

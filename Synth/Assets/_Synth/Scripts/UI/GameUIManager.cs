@@ -7,12 +7,12 @@ using UnityEngine.UI;
 
 public class GameUIManager : MonoBehaviour
 {
-    public GameObject settingsPanel; // Verwijzing naar je Settings Panel
+    public GameObject settingsPanel;
     public Button SettingsButton, CloseButton, RecordButtonStart, RecordButtonStop;
     private bool Isrecording = false, IsCoroutineRunning = false;
     private AudioRecorder audioRecorder;
-    private Color defaultColor; // Standaardkleur
-    private Color toggledColor = Color.red; // Kleur wanneer getoggled
+    private Color defaultColor;
+    private Color toggledColor = Color.red;
     public Dropdown RecordingLengthDropDown;
     public Text TimerText;
 
