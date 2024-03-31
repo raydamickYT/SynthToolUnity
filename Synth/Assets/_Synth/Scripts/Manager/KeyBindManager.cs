@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
-using ScrollView = UnityEngine.UIElements.ScrollView;
+using System.IO;
 
 public class KeybindManager : MonoBehaviour
 {
@@ -18,12 +18,13 @@ public class KeybindManager : MonoBehaviour
         new SynthAction(KeyCode.V, 7, "Synth7"),
         new SynthAction(KeyCode.E, 8, "Synth8"),
         new SynthAction(KeyCode.W, 9, "Synth9"),
-
     };
     public List<Button> actionButtons; // Een lijst met alle UI knoppen
     public GameObject ButtonsParent;
     public Text waitingForKeyText; // Een tekst UI element dat aangeeft dat het systeem wacht op een key press
     private SynthAction actionToRebind = null; // Houdt bij welke actie opnieuw gebonden wordt
+    private SavePlayerPrefs savePlayerPrefs;
+    public Button Apply;
 
     private void Start()
     {
@@ -31,7 +32,8 @@ public class KeybindManager : MonoBehaviour
         {
             Instance = this;
         }
-
+        savePlayerPrefs = new(this);
+        LoadKeybindsFromFile(); // laad de keybinds
         InitializeButtons();
     }
     void Update()
@@ -52,7 +54,7 @@ public class KeybindManager : MonoBehaviour
             }
         }
     }
-    
+
     public void InitializeButtons()
     {
         int Index = 1;
@@ -67,6 +69,7 @@ public class KeybindManager : MonoBehaviour
             }
             UpdateKeybindButtonTexts();
         }
+        Apply.onClick.AddListener(SaveKeybindsToFile);
     }
     public void UpdateKeybindButtonTexts()
     {
@@ -100,10 +103,25 @@ public class KeybindManager : MonoBehaviour
         }
     }
 
-    void UpdateKeybindUI(KeyCode keyCode)
+    public void SaveKeybindsToFile()
     {
-        Debug.Log("action complete, code: " + keyCode);
-        // Implementeer logica om je UI te updaten op basis van de nieuwe keybindings
-        // Dit kan betekenen dat je door je synthActions gaat en de UI elementen bijwerkt om de nieuwe keys te tonen
+        string path = Path.Combine(Application.persistentDataPath, "keybinds.json");
+        string json = JsonUtility.ToJson(this, true);
+        File.WriteAllText(path, json);
+    }
+
+    public void LoadKeybindsFromFile()
+    {
+        string path = Path.Combine(Application.persistentDataPath, "keybinds.json");
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+            JsonUtility.FromJsonOverwrite(json, this);
+        }
+        else
+        {
+            // Als het bestand niet bestaat, sla dan de huidige keybinds op 
+            SaveKeybindsToFile();
+        }
     }
 }

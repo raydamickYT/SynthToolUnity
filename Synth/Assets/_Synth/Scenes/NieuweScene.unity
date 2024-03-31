@@ -141,7 +141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &8278567
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1058,7 +1058,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5c4e769d3de72d4099be7c9d0dec8b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SynthObject: {fileID: 206308980}
   settingsPanel: {fileID: 709583865}
   SettingsButton: {fileID: 411773301}
   CloseButton: {fileID: 1168867345}
@@ -1137,7 +1136,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Synth 1:'
+  m_Text: 'Synth 6:'
 --- !u!222 &138748086
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1146,17 +1145,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 138748083}
   m_CullTransparentMesh: 1
---- !u!114 &206308980 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8598984701651117793, guid: 6f648f1df2bc1024997023a9647917f2, type: 3}
-  m_PrefabInstance: {fileID: 4039694536643841492}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fa0f6e617c66d540887fe7388d6ca5d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &217820691
 GameObject:
   m_ObjectHideFlags: 0
@@ -2491,7 +2479,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Synth 1:'
+  m_Text: 'Synth 8:'
 --- !u!222 &486313584
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3084,6 +3072,7 @@ MonoBehaviour:
   actionButtons: []
   ButtonsParent: {fileID: 112503606}
   waitingForKeyText: {fileID: 1272237758}
+  Apply: {fileID: 529827275}
 --- !u!1 &638426877
 GameObject:
   m_ObjectHideFlags: 0
@@ -4287,7 +4276,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Synth 1:'
+  m_Text: 'Synth 9:'
 --- !u!222 &947199064
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4524,7 +4513,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Synth 1:'
+  m_Text: 'Synth 10:'
 --- !u!222 &992967326
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4918,7 +4907,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Synth 1:'
+  m_Text: 'Synth 7:'
 --- !u!222 &1109528465
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5806,7 +5795,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Synth 1:'
+  m_Text: 'Synth 2:'
 --- !u!222 &1363089553
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6192,7 +6181,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Synth 1:'
+  m_Text: 'Synth 4:'
 --- !u!222 &1558406944
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6504,7 +6493,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Synth 1:'
+  m_Text: 'Synth 5:'
 --- !u!222 &1581533652
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8185,7 +8174,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Synth 1:'
+  m_Text: 'Synth 3:'
 --- !u!222 &2117412706
 CanvasRenderer:
   m_ObjectHideFlags: 0
